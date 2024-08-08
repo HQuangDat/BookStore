@@ -1,3 +1,6 @@
+using BookStore.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace BookStore
 {
     public class Program
@@ -9,7 +12,9 @@ namespace BookStore
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            //Connect 
+            //Connect database
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("BookStore")));
 
             var app = builder.Build();
 
