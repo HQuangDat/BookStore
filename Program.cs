@@ -1,4 +1,7 @@
 using BookStore.Data;
+using BookStore.Models.Entity;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore
@@ -16,6 +19,25 @@ namespace BookStore
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("BookStore")));
 
+            //Add PasswordHasher
+            builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
+
+            //Add Authenticate - Authorize
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+            });
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -31,6 +53,8 @@ namespace BookStore
 
             app.UseRouting();
 
+            //Call method for using Auth
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
