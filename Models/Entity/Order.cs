@@ -16,6 +16,7 @@ namespace BookStore.Models.Entity
         public DateTime OrderDate { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18,2)")]
         [DataType(DataType.Currency)]
         public decimal TotalAmount { get; set; }
 

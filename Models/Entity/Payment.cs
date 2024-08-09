@@ -16,7 +16,7 @@ namespace BookStore.Models.Entity
         public DateTime PaymentDate { get; set; }
 
         [Required]
-        [Range(0, 999999.99)]
+        [Column(TypeName = "decimal(18,2)")]
         [DataType(DataType.Currency)]
         public decimal PaymentAmount { get; set; }
 

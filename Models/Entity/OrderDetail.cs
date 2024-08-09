@@ -19,7 +19,7 @@ namespace BookStore.Models.Entity
         public int Quantity { get; set; }
 
         [Required]
-        [Range(0, 9999.99)]
+        [Column(TypeName = "decimal(18,2)")]
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
 
