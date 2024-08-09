@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BookStore.Models.Entity
 {
-    public class Cart
+    public class OrderDetail
     {
         [Key]
-        public Guid CartID { get; set; }
+        public Guid OrderDetailID { get; set; }
 
         [Required]
-        public Guid CustomerID { get; set; }
+        public Guid OrderID { get; set; }
 
         [Required]
         public Guid BookID { get; set; }
@@ -18,8 +18,13 @@ namespace BookStore.Models.Entity
         [Range(1, int.MaxValue)]
         public int Quantity { get; set; }
 
-        [ForeignKey("CustomerID")]
-        public virtual Customer Customer { get; set; }
+        [Required]
+        [Range(0, 9999.99)]
+        [DataType(DataType.Currency)]
+        public decimal Price { get; set; }
+
+        [ForeignKey("OrderID")]
+        public virtual Order Order { get; set; }
 
         [ForeignKey("BookID")]
         public virtual Book Book { get; set; }
