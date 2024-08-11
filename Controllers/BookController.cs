@@ -29,7 +29,7 @@ namespace BookStore.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Authors = new SelectList(dbContext.Authors, "AuthorID", "FullName");
+                ViewBag.Authors = new SelectList(dbContext.Authors, "AuthorID", "LastName");
                 ViewBag.Categories = new SelectList(dbContext.Categories, "CategoryID", "CategoryName");
                 return View(book);
             }
