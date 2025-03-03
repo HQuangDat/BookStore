@@ -12,6 +12,10 @@ public partial class Warehouse
     [Key]
     public int WarehouseId { get; set; }
 
+    [Required]
+    [StringLength(255)]
+    public string location { get; set; } = null!;
+
     public int? Remaining { get; set; }
 
     [InverseProperty("Warehouse")]
