@@ -14,14 +14,19 @@ public partial class Book
 
     [StringLength(255)]
     [Unicode(false)]
+    [Required]
     public string BookName { get; set; } = null!;
 
     [StringLength(100)]
     [Unicode(false)]
+    [Required]
     public string? Provider { get; set; }
 
     [Column(TypeName = "decimal(10, 2)")]
+    [Required]
     public decimal Price { get; set; }
+
+    public string? ImagePath { get; set; }
 
     public int AuthorId { get; set; }
 

@@ -14,6 +14,7 @@ public partial class Author
 
     [StringLength(100)]
     [Unicode(false)]
+    [Required]
     public string Name { get; set; } = null!;
 
     [InverseProperty("Author")]

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,18 +13,23 @@ public partial class Account
 
     [StringLength(50)]
     [Unicode(false)]
+    [Required]
     public string Username { get; set; } = null!;
 
     [StringLength(255)]
     [Unicode(false)]
+    [Required]
     public string Password { get; set; } = null!;
 
     [StringLength(100)]
     [Unicode(false)]
+    [Required]
+    [EmailAddress(ErrorMessage = "You must enter a valid email address!")]
     public string Email { get; set; } = null!;
 
     [StringLength(255)]
     [Unicode(false)]
+    [Required]
     public string? Address { get; set; }
 
     [InverseProperty("Account")]
