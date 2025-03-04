@@ -28,13 +28,8 @@ public partial class Book
 
     public string? ImagePath { get; set; }
 
-    public int AuthorId { get; set; }
-
-    public int WarehouseId { get; set; }
-
-    [ForeignKey("AuthorId")]
-    [InverseProperty("Books")]
-    public virtual Author Author { get; set; } = null!;
+    [Required]
+    public string Author { get; set; } = null!;
 
     [InverseProperty("Book")]
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
@@ -48,4 +43,7 @@ public partial class Book
     [ForeignKey("BookId")]
     [InverseProperty("Books")]
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+
+    [NotMapped]
+    public List<int> SelectedCategories { get; set; } = new List<int>();
 }

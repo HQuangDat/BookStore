@@ -12,8 +12,6 @@ namespace BookStore.Data
 
         public virtual DbSet<Account> Accounts { get; set; }
 
-        public virtual DbSet<Author> Authors { get; set; }
-
         public virtual DbSet<Book> Books { get; set; }
 
         public virtual DbSet<Cart> Carts { get; set; }
@@ -54,18 +52,9 @@ namespace BookStore.Data
                         });
             });
 
-            modelBuilder.Entity<Author>(entity =>
-            {
-                entity.HasKey(e => e.AuthorId).HasName("PK__Author__70DAFC34C0359CB4");
-            });
-
             modelBuilder.Entity<Book>(entity =>
             {
                 entity.HasKey(e => e.BookId).HasName("PK__Book__3DE0C2075FE3A1F9");
-
-                entity.HasOne(d => d.Author).WithMany(p => p.Books)
-                    .OnDelete(DeleteBehavior.Restrict) // Prevent deleting an Author if Books exist
-                    .HasConstraintName("FK_Book_Author");
 
                 entity.HasMany(b => b.Warehouses)
                 .WithMany(w => w.Books)

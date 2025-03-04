@@ -1,17 +1,19 @@
 ﻿@model BookStore.DataModels.Book
-@if(User.IsInRole("Admin")){
-    <section class="vh-100 d-flex align-items-center justify-content-center">
+@if (User.IsInRole("Admin"))
+{
+    <section class="min-vh-100 d-flex align-items-center justify-content-center py-5">
         <div class="container">
             <div class="row d-flex justify-content-center">
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-                    <div class="card bg-light text-black shadow-lg rounded-4">
+                    <div class="card bg-light text-black shadow-lg rounded-4 overflow-auto">
                         <div class="card-body p-5">
 
-                            <h2 class="fw-bold text-uppercase text-center mb-3">Add new book</h2>
+                            <h2 class="fw-bold text-uppercase text-center mb-3">Add New Book</h2>
                             <p class="text-muted text-center">Enter Book Information</p>
 
-                            <form method="post">
+                            <form method="post" enctype="multipart/form-data">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Name</label>
                                     <input type="text" asp-for="BookName" class="form-control" />
@@ -30,27 +32,25 @@
                                     <span asp-validation-for="Price" class="text-danger"></span>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Author</label>
-                                    <select asp-for="Author" asp-items="@ViewBag.Authors" class="form-control" />
+                                <div data-mdb-input-init class="form-outline mb-3">
+                                    <label class="form-label" asp-for="Author">Author</label>
+                                    <select asp-for="Author" class="form-select form-control-lg">
+                                        <option value="John Titor">John Titor</option>
+                                        <option value="John Wick">John Wick</option>
+                                        <option value="OpenHeimer">OpenHeimer</option>
+                                    </select>
                                     <span asp-validation-for="Author" class="text-danger"></span>
                                 </div>
 
-                                @* <div class="mb-3"> *@
-                                @*     <label class="form-label">WareHouse</label> *@
-                                @*     <select asp-for="Warehouse" asp-items="@ViewBag.Warehouses" class="form-control" /> *@
-                                @*     <span asp-validation-for="Warehouse" class="text-danger"></span> *@
-                                @* </div> *@
-
                                 <div class="mb-3">
                                     <label class="form-label">Category</label>
-                                    <select asp-for="Categories" asp-items="@ViewBag.Categories" class="form-control" />
+                                    <select asp-for="SelectedCategories" class="form-control" asp-items="ViewBag.Categories" multiple></select>
                                     <span asp-validation-for="Categories" class="text-danger"></span>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Image</label>
-                                    <input type="file" asp-for="ImagePath" class="form-control" />
+                                    <input type="text" asp-for="ImagePath" class="form-control" placeholder="Upload image path here" />
                                     <span asp-validation-for="ImagePath" class="text-danger"></span>
                                 </div>
 
@@ -58,6 +58,7 @@
                                     <button type="submit" class="btn btn-dark w-100 py-2">Submit</button>
                                 </div>
                             </form>
+
                         </div>
                     </div>
                 </div>
@@ -67,5 +68,5 @@
 }
 else
 {
-    <h1>You should not be here</h1>
+    <h1 class="text-center mt-5">You should not be here</h1>
 }

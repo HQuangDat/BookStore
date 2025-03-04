@@ -1,4 +1,58 @@
 ﻿@model BookStore.DataModels.Book
-@{
 
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Book</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BookId" />
+            <div class="form-group">
+                <label asp-for="BookName" class="control-label"></label>
+                <input asp-for="BookName" class="form-control" />
+                <span asp-validation-for="BookName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Provider" class="control-label"></label>
+                <input asp-for="Provider" class="form-control" />
+                <span asp-validation-for="Provider" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImagePath" class="control-label"></label>
+                <input type="text" asp-for="ImagePath" class="form-control" placeholder="Upload book cover image path here" />
+                <span asp-validation-for="ImagePath" class="text-danger"></span>
+            </div>
+            <div data-mdb-input-init class="form-outline mb-3">
+                <label class="form-label" asp-for="Author">Author</label>
+                <select asp-for="Author" class="form-select form-control-lg">
+                    <option value="John Titor">John Titor</option>
+                    <option value="John Wick">John Wick</option>
+                    <option value="OpenHeimer">OpenHeimer</option>
+                </select>
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="List">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

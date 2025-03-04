@@ -4,6 +4,7 @@ using BookStore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304011427_removeWarehouseIdfromBook")]
+    partial class removeWarehouseIdfromBook
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,6 +96,26 @@ namespace BookStore.Migrations
                     b.ToTable("Account");
                 });
 
+            modelBuilder.Entity("BookStore.DataModels.Author", b =>
+                {
+                    b.Property<int>("AuthorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuthorId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("AuthorId")
+                        .HasName("PK__Author__70DAFC34C0359CB4");
+
+                    b.ToTable("Author");
+                });
+
             modelBuilder.Entity("BookStore.DataModels.Book", b =>
                 {
                     b.Property<int>("BookId")
@@ -101,9 +124,8 @@ namespace BookStore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
 
-                    b.Property<string>("Author")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
 
                     b.Property<string>("BookName")
                         .IsRequired()
@@ -125,6 +147,8 @@ namespace BookStore.Migrations
 
                     b.HasKey("BookId")
                         .HasName("PK__Book__3DE0C2075FE3A1F9");
+
+                    b.HasIndex("AuthorId");
 
                     b.ToTable("Book");
                 });
@@ -333,6 +357,18 @@ namespace BookStore.Migrations
                         .HasConstraintName("FK_BookCategories_Category");
                 });
 
+            modelBuilder.Entity("BookStore.DataModels.Book", b =>
+                {
+                    b.HasOne("BookStore.DataModels.Author", "Author")
+                        .WithMany("Books")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Book_Author");
+
+                    b.Navigation("Author");
+                });
+
             modelBuilder.Entity("BookStore.DataModels.Cart", b =>
                 {
                     b.HasOne("BookStore.DataModels.Account", "Account")
@@ -421,6 +457,11 @@ namespace BookStore.Migrations
                     b.Navigation("Carts");
 
                     b.Navigation("Receipts");
+                });
+
+            modelBuilder.Entity("BookStore.DataModels.Author", b =>
+                {
+                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Book", b =>

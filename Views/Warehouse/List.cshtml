@@ -1,0 +1,45 @@
+﻿@model IEnumerable<BookStore.DataModels.Warehouse>
+
+@{
+    ViewData["Title"] = "List";
+}
+
+<h1>List</h1>
+
+<p>
+    <a asp-action="Add">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.location)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Remaining)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.location)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Remaining)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.WarehouseId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.WarehouseId">Details</a> |
+                    <form asp-action="Delete" asp-route-id="@item.WarehouseId" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this warehouse?');">
+                            Delete
+                        </button>
+                    </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

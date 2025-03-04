@@ -15,55 +15,55 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddWarehouse()
+        public IActionResult Add()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult AddWarehouse(Warehouse warehouse)
+        public IActionResult Add(Warehouse warehouse)
         {
             if (ModelState.IsValid)
             {
                 _db.Warehouses.Add(warehouse);
                 _db.SaveChanges();
                 TempData["success"] = "Warehouse added successfully!";
-                return RedirectToAction("ListWarehouses");
+                return RedirectToAction("List");
             }
             TempData["error"] = "Failed to add warehouse!";
-            return RedirectToAction("ListWarehouses");
+            return RedirectToAction("List");
         }
 
         //Edit method
         [HttpGet]
-        public IActionResult EditWarehouse(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 TempData["error"] = "Warehouse not found!";
-                return RedirectToAction("ListWarehouses");
+                return RedirectToAction("List");
             }
             var warehouse = _db.Warehouses.Find(id);
             return View(warehouse);
         }
 
         [HttpPost]
-        public IActionResult EditWarehouse(Warehouse warehouse)
+        public IActionResult Edit(Warehouse warehouse)
         {
             if (ModelState.IsValid)
             {
                 _db.Warehouses.Update(warehouse);
                 _db.SaveChanges();
                 TempData["success"] = "Warehouse updated successfully!";
-                return RedirectToAction("ListWarehouses");
+                return RedirectToAction("List");
             }
             TempData["error"] = "Failed to update warehouse!";
-            return RedirectToAction("ListWarehouses");
+            return RedirectToAction("List");
         }
 
         //List method
         [HttpGet]
-        public IActionResult ListWarehouses()
+        public IActionResult List()
         {
             var warehouses = _db.Warehouses.ToList();
             return View(warehouses);

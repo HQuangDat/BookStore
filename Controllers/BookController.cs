@@ -21,29 +21,30 @@ namespace BookStore.Controllers
         public IActionResult Add()
         {
             ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "Name");
-            ViewBag.Warehouses = new SelectList(_db.Warehouses, "WarehouseId", "Name");
-            ViewBag.Authors = new SelectList(_db.Authors, "AuthorId", "Name");
             return View();
         }
 
         [HttpPost]
         public IActionResult Add(Book book)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
+                book.Categories = _db.Categories.Where(c => book.SelectedCategories.Contains(c.CategoryId)).ToList();
+
                 _db.Books.Add(book);
                 _db.SaveChanges();
+
                 TempData["success"] = "Book added successfully!";
                 return RedirectToAction("List");
             }
 
             ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "Name");
-            ViewBag.Warehouses = new SelectList(_db.Warehouses, "WarehouseId", "Name");
-            ViewBag.Authors = new SelectList(_db.Authors, "AuthorId", "Name");
-
             TempData["error"] = "Failed to add book!";
-            return RedirectToAction("List");
-        }   
+            return View(book);
+        }
+
+
+
 
         //Edit method
         [HttpGet]
@@ -55,7 +56,6 @@ namespace BookStore.Controllers
                 return RedirectToAction("List");
             }
             var book = _db.Books.Include(ct => ct.Categories)
-                .Include(au => au.Author)
                 //.Include(wh=>wh.Warehouse)
                 .FirstOrDefault(y=>y.BookId == id);
 
@@ -77,11 +77,9 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        public IActionResult ListBook()
+        public IActionResult List()
         {
-            var books = _db.Books.Include(ct=>ct.Categories)
-                .Include(au=>au.Author)
-                .ToList();
+            var books = _db.Books.Include(ct=>ct.Categories).ToList();
             return View(books);
         }
 
@@ -99,77 +97,6 @@ namespace BookStore.Controllers
             _db.SaveChanges();
             TempData["success"] = "Book deleted successfully!";
             return RedirectToAction("List");
-        }
-
-        //Category Section
-        //Add function
-        [HttpGet]
-        public IActionResult AddCategory()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult AddCategory(Category category)
-        {
-            if (ModelState.IsValid)
-            {
-                _db.Categories.Add(category);
-                _db.SaveChanges();
-                TempData["success"] = "Category added successfully!";
-                return RedirectToAction("List");
-            }
-            TempData["error"] = "Failed to add category!";
-            return RedirectToAction("ListCategory");
-        }
-
-        //Edit method
-        [HttpGet]
-        public IActionResult EditCategory(int? id)
-        {
-            if (id == null)
-            {
-                TempData["error"] = "Category not found!";
-                return RedirectToAction("ListCategory");
-            }
-            var category = _db.Categories.FirstOrDefault(y => y.CategoryId == id);
-
-            return View(category);
-        }
-
-        public IActionResult EditCategory(Category category)
-        {
-            if(ModelState.IsValid)
-            {
-                _db.Categories.Update(category);
-                _db.SaveChanges();
-                TempData["success"] = "Category updated successfully!";
-                return RedirectToAction("ListCategory");
-            }
-            return View(category);
-        }
-
-        [HttpGet]
-        public IActionResult ListCategory()
-        {
-            var categories = _db.Categories.ToList();
-            return View(categories);
-        }
-
-        //Delete method
-        [HttpPost]
-        public IActionResult DeleteCategory(int? id)
-        {
-            if (id == null)
-            {
-                TempData["error"] = "Category not found!";
-                return RedirectToAction("ListCategory");
-            }
-            var category = _db.Categories.FirstOrDefault(y => y.CategoryId == id);
-            _db.Categories.Remove(category);
-            _db.SaveChanges();
-            TempData["success"] = "Category deleted successfully!";
-            return RedirectToAction("ListCategory");
         }
     }
 }
