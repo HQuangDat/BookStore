@@ -1,11 +1,13 @@
 ﻿using BookStore.Data;
 using BookStore.DataModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -34,6 +36,11 @@ namespace BookStore.Controllers
                 TempData["success"] = "Book added successfully!";
                 return RedirectToAction("List");
             }
+
+            ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "Name");
+            ViewBag.Warehouses = new SelectList(_db.Warehouses, "WarehouseId", "Name");
+            ViewBag.Authors = new SelectList(_db.Authors, "AuthorId", "Name");
+
             TempData["error"] = "Failed to add book!";
             return RedirectToAction("List");
         }   
@@ -49,7 +56,8 @@ namespace BookStore.Controllers
             }
             var book = _db.Books.Include(ct => ct.Categories)
                 .Include(au => au.Author)
-                .Include(wh=>wh.Warehouse).FirstOrDefault(y=>y.BookId == id);
+                //.Include(wh=>wh.Warehouse)
+                .FirstOrDefault(y=>y.BookId == id);
 
             return View(book);
         }
@@ -69,7 +77,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        public IActionResult List()
+        public IActionResult ListBook()
         {
             var books = _db.Books.Include(ct=>ct.Categories)
                 .Include(au=>au.Author)

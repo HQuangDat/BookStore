@@ -67,9 +67,21 @@ namespace BookStore.Data
                     .OnDelete(DeleteBehavior.Restrict) // Prevent deleting an Author if Books exist
                     .HasConstraintName("FK_Book_Author");
 
-                entity.HasOne(d => d.Warehouse).WithMany(p => p.Books)
-                    .OnDelete(DeleteBehavior.Restrict) // Prevent deleting a Warehouse if Books exist
-                    .HasConstraintName("FK_Book_Warehouse");
+                entity.HasMany(b => b.Warehouses)
+                .WithMany(w => w.Books)
+                .UsingEntity<Dictionary<string, object>>(
+                    "BookWarehouse",  
+                    b => b.HasOne<Warehouse>().WithMany().HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("FK_BookWarehouse_Warehouse"),
+                    w => w.HasOne<Book>().WithMany().HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("FK_BookWarehouse_Book"),
+                    j =>
+                    {
+                        j.HasKey("BookId", "WarehouseId");
+                        j.ToTable("BookWarehouse"); 
+                    });
 
                 entity.HasMany(d => d.Categories).WithMany(p => p.Books)
                     .UsingEntity<Dictionary<string, object>>(

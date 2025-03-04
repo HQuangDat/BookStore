@@ -18,6 +18,7 @@ public partial class Warehouse
 
     public int? Remaining { get; set; }
 
-    [InverseProperty("Warehouse")]
+    [ForeignKey("WarehouseId")]
+    [InverseProperty("Warehouses")]
     public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }
