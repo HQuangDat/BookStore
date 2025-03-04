@@ -131,46 +131,22 @@ namespace BookStore.Migrations
 
             modelBuilder.Entity("BookStore.DataModels.Cart", b =>
                 {
-                    b.Property<int>("CartId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartId"));
-
                     b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.HasKey("CartId")
-                        .HasName("PK__Cart__51BCD7B729F11DEC");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Cart");
-                });
-
-            modelBuilder.Entity("BookStore.DataModels.CartItem", b =>
-                {
-                    b.Property<int>("CartId")
                         .HasColumnType("int");
 
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.HasKey("CartId", "BookId");
+                    b.HasKey("AccountId", "BookId");
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Category", b =>
@@ -338,32 +314,20 @@ namespace BookStore.Migrations
                     b.HasOne("BookStore.DataModels.Account", "Account")
                         .WithMany("Carts")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_Cart_Account");
 
-                    b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("BookStore.DataModels.CartItem", b =>
-                {
                     b.HasOne("BookStore.DataModels.Book", "Book")
-                        .WithMany("CartItems")
+                        .WithMany("Carts")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_CartItems_Book");
+                        .HasConstraintName("FK_Cart_Book");
 
-                    b.HasOne("BookStore.DataModels.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_CartItems_Cart");
+                    b.Navigation("Account");
 
                     b.Navigation("Book");
-
-                    b.Navigation("Cart");
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Receipt", b =>
@@ -425,14 +389,9 @@ namespace BookStore.Migrations
 
             modelBuilder.Entity("BookStore.DataModels.Book", b =>
                 {
-                    b.Navigation("CartItems");
+                    b.Navigation("Carts");
 
                     b.Navigation("ReceiptItems");
-                });
-
-            modelBuilder.Entity("BookStore.DataModels.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Receipt", b =>

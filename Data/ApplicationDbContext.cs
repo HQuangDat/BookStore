@@ -16,8 +16,6 @@ namespace BookStore.Data
 
         public virtual DbSet<Cart> Carts { get; set; }
 
-        public virtual DbSet<CartItem> CartItems { get; set; }
-
         public virtual DbSet<Category> Categories { get; set; }
 
         public virtual DbSet<Receipt> Receipts { get; set; }
@@ -92,26 +90,21 @@ namespace BookStore.Data
 
             modelBuilder.Entity<Cart>(entity =>
             {
-                entity.HasKey(e => e.CartId).HasName("PK__Cart__51BCD7B729F11DEC");
+                entity.HasKey(e => new { e.AccountId, e.BookId }); // Composite key
 
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.Account).WithMany(p => p.Carts)
-                    .OnDelete(DeleteBehavior.Restrict) // Prevent deleting an Account if Carts exist
-                    .HasConstraintName("FK_Cart_Account");
-            });
-
-            modelBuilder.Entity<CartItem>(entity =>
-            {
                 entity.Property(e => e.Quantity).HasDefaultValue(1);
 
-                entity.HasOne(d => d.Book).WithMany(p => p.CartItems)
-                    .OnDelete(DeleteBehavior.Cascade) // Cascade delete CartItems if the Book is deleted
-                    .HasConstraintName("FK_CartItems_Book");
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.Carts)
+                    .HasForeignKey(d => d.AccountId)
+                    .OnDelete(DeleteBehavior.Cascade) 
+                    .HasConstraintName("FK_Cart_Account");
 
-                entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
-                    .OnDelete(DeleteBehavior.Cascade) // Cascade delete CartItems if the Cart is deleted
-                    .HasConstraintName("FK_CartItems_Cart");
+                entity.HasOne(d => d.Book)
+                    .WithMany(p => p.Carts)
+                    .HasForeignKey(d => d.BookId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Cart_Book");
             });
 
             modelBuilder.Entity<Category>(entity =>

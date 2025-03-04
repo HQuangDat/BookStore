@@ -42,3 +42,4 @@ public partial class Account
     [InverseProperty("Accounts")]
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 }
+

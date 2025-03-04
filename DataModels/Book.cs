@@ -32,9 +32,6 @@ public partial class Book
     public string Author { get; set; } = null!;
 
     [InverseProperty("Book")]
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
-
-    [InverseProperty("Book")]
     public virtual ICollection<ReceiptItem> ReceiptItems { get; set; } = new List<ReceiptItem>();
 
     [ForeignKey("BookId")]
@@ -43,6 +40,9 @@ public partial class Book
     [ForeignKey("BookId")]
     [InverseProperty("Books")]
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+
+    [InverseProperty("Book")]
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     [NotMapped]
     public List<int> SelectedCategories { get; set; } = new List<int>();
