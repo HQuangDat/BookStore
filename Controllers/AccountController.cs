@@ -34,12 +34,12 @@ namespace BookStore.Controllers
         public async Task<IActionResult> Login(string username, string password)
         {
             var existUser = await _db.Accounts.Include(role => role.Roles).
-                FirstOrDefaultAsync(name=>name.Username == username);
+                FirstOrDefaultAsync(name => name.Username == username);
 
-            if(existUser != null)
+            if (existUser != null)
             {
                 PasswordVerificationResult result = _passwordHasher.VerifyHashedPassword(existUser, existUser.Password, password);
-                if(result == PasswordVerificationResult.Success)
+                if (result == PasswordVerificationResult.Success)
                 {
                     var claims = new List<Claim>
                     {
@@ -78,7 +78,7 @@ namespace BookStore.Controllers
         [HttpPost]
         public IActionResult Register(Account user)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 user.Password = _passwordHasher.HashPassword(user, user.Password);
                 user.Roles.Add(_db.Roles.Find(2));
@@ -110,8 +110,8 @@ namespace BookStore.Controllers
         [HttpPost]
         public IActionResult Delete(int? id)
         {
-            Account user = _db.Accounts.FirstOrDefault(us=>us.AccountId == id);
-            if(user != null)
+            Account user = _db.Accounts.FirstOrDefault(us => us.AccountId == id);
+            if (user != null)
             {
                 _db.Accounts.Remove(user);
                 _db.SaveChanges();

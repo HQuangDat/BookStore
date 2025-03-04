@@ -83,6 +83,19 @@ namespace BookStore.Controllers
             return View(books);
         }
 
+        //For Book details
+        [HttpGet]
+        public IActionResult Details(int? id)
+        {
+            if (id != null)
+            {
+                var detailBook = _db.Books.Find(id);
+                return View(detailBook);
+            }
+            TempData["error"] = "Book not found!";
+            return RedirectToAction("List");
+        }
+
         //Delete method
         [HttpPost]
         public IActionResult Delete(int? id)
