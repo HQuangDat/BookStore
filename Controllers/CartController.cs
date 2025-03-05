@@ -2,6 +2,7 @@
 using BookStore.DataModels;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BookStore.Controllers
@@ -16,15 +17,28 @@ namespace BookStore.Controllers
 
         //Add item to Cart
         [HttpPost]
-        public IActionResult Add(Cart cart)
+        [ValidateAntiForgeryToken]
+        public IActionResult Add(int? id)
         {
-            if(ModelState.IsValid)
+            if(id != null)
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                cart.AccountId = int.Parse(userId);
-                _db.Carts.Add(cart);
-                TempData["success"] = "Add to cart successfully";
-                _db.SaveChanges();
+                var cartBook = _db.Books.Find(id);
+                if(userId != null && cartBook != null)
+                {
+                    var cart = new Cart
+                    {
+                        AccountId = int.Parse(userId),
+                        BookId = id.Value
+                    };
+                    _db.Carts.Add(cart);
+                    TempData["success"] = "Add to cart successfully";
+                    _db.SaveChanges();
+                }
+                else
+                {
+                    TempData["error"] = "Invalid book or user";
+                }
             }
             return RedirectToAction("Index");
         }
@@ -33,7 +47,7 @@ namespace BookStore.Controllers
         public IActionResult Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var listCart = _db.Carts.Where(id=> id.AccountId.ToString() == userId).ToList();
+            var listCart = _db.Carts.Include(bk=>bk.Book).Where(id=> id.AccountId.ToString() == userId).ToList();
             return View(listCart);
         }
     }

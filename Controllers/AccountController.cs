@@ -31,6 +31,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string username, string password)
         {
             var existUser = await _db.Accounts.Include(role => role.Roles).
@@ -76,6 +77,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Register(Account user)
         {
             if (ModelState.IsValid)
@@ -108,6 +110,7 @@ namespace BookStore.Controllers
 
         //For Delete
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int? id)
         {
             Account user = _db.Accounts.FirstOrDefault(us => us.AccountId == id);
@@ -120,6 +123,14 @@ namespace BookStore.Controllers
             }
             TempData["error"] = "User not found";
             return NotFound();
+        }
+
+        //For list
+        [HttpGet]
+        public IActionResult List()
+        {
+            var listAccount = _db.Accounts.ToList();
+            return View(listAccount);
         }
     }
 }

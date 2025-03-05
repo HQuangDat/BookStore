@@ -21,6 +21,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Add(Warehouse warehouse)
         {
             if (ModelState.IsValid)
@@ -48,6 +49,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Warehouse warehouse)
         {
             if (ModelState.IsValid)

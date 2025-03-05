@@ -1,0 +1,49 @@
+﻿@model IEnumerable<BookStore.DataModels.Cart>
+
+@{
+    ViewData["Title"] = "Cart item";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Shopping Cart</h1>
+    <table class="table table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Book Name</th>
+                <th>Image</th>
+                <th>Quantity</th>
+                <th class="text-center">Actions</th>
+                <th class="text-center">Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Book.BookName)</td>
+                    <td>
+                        <img src="@Html.DisplayFor(modelItem => item.Book.ImagePath)" alt="Book Image" class="img-thumbnail" style="width: 80px; height: auto;">
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                    <td class="text-center">
+                        <!-- Increase/Decrease Quantity (You will handle the logic) -->
+                        <button class="btn btn-outline-secondary">-</button>
+                        <button class="btn btn-outline-secondary">+</button>
+                    </td>
+                    <td class="text-center">
+                        <form asp-action="Delete" asp-route-id="@item.BookId" method="post">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Remove this item from cart?');">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Continue Shopping
+        </a>
+    </div>
+</div>

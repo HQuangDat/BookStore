@@ -9,6 +9,7 @@ namespace BookStore.DataModels;
 [Table("Cart")]
 public partial class Cart
 {
+
     [Key]
     public int AccountId { get; set; }
 

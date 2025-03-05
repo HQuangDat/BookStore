@@ -20,6 +20,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Add(Category category)
         {
             if (ModelState.IsValid)
@@ -47,6 +48,9 @@ namespace BookStore.Controllers
             return View(category);
         }
 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Category category)
         {
             if (ModelState.IsValid)
@@ -68,6 +72,7 @@ namespace BookStore.Controllers
 
         //Delete method
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int? id)
         {
             if (id == null)

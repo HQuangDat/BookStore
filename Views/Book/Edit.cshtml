@@ -4,54 +4,66 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1 class="mb-4">Edit Book</h1>
 
-<h4>Book</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="BookId" />
-            <div class="form-group">
-                <label asp-for="BookName" class="control-label"></label>
-                <input asp-for="BookName" class="form-control" />
-                <span asp-validation-for="BookName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Provider" class="control-label"></label>
-                <input asp-for="Provider" class="form-control" />
-                <span asp-validation-for="Provider" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImagePath" class="control-label"></label>
-                <input type="text" asp-for="ImagePath" class="form-control" placeholder="Upload book cover image path here" />
-                <span asp-validation-for="ImagePath" class="text-danger"></span>
-            </div>
-            <div data-mdb-input-init class="form-outline mb-3">
-                <label class="form-label" asp-for="Author">Author</label>
-                <select asp-for="Author" class="form-select form-control-lg">
-                    <option value="John Titor">John Titor</option>
-                    <option value="John Wick">John Wick</option>
-                    <option value="OpenHeimer">OpenHeimer</option>
-                </select>
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="card shadow-sm p-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="post" asp-action="Edit">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="BookId" />
+
+                <!-- Book Name -->
+                <div class="mb-3">
+                    <label asp-for="BookName" class="form-label fw-bold">Book Name</label>
+                    <input asp-for="BookName" class="form-control" placeholder="Enter book name" />
+                    <span asp-validation-for="BookName" class="text-danger"></span>
+                </div>
+
+                <!-- Provider -->
+                <div class="mb-3">
+                    <label asp-for="Provider" class="form-label fw-bold">Provider</label>
+                    <input asp-for="Provider" class="form-control" placeholder="Enter provider name" />
+                    <span asp-validation-for="Provider" class="text-danger"></span>
+                </div>
+
+                <!-- Price -->
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label fw-bold">Price</label>
+                    <input asp-for="Price" class="form-control" placeholder="Enter book price" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <!-- Image Path -->
+                <div class="mb-3">
+                    <label asp-for="ImagePath" class="form-label fw-bold">Book Cover Image</label>
+                    <div class="input-group">
+                        <input type="text" asp-for="ImagePath" class="form-control" placeholder="Upload book cover image path here" />
+                    </div>
+                    <span asp-validation-for="ImagePath" class="text-danger"></span>
+                </div>
+
+                <!-- Author Dropdown -->
+                <div class="mb-3">
+                    <label asp-for="Author" class="form-label fw-bold">Author</label>
+                    <select asp-for="Author" class="form-select">
+                        <option value="John Titor">John Titor</option>
+                        <option value="John Wick">John Wick</option>
+                        <option value="OpenHeimer">OpenHeimer</option>
+                    </select>
+                    <span asp-validation-for="Author" class="text-danger"></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between">
+                    <a asp-action="List" class="btn btn-outline-secondary">Back to List</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="List">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
