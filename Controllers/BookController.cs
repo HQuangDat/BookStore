@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Controllers
 {
-    [Authorize(Roles = "Admin")]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -18,6 +17,7 @@ namespace BookStore.Controllers
 
         //Add function
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add()
         {
             ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "Name");
@@ -25,6 +25,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public IActionResult Add(Book book)
         {
@@ -49,6 +50,7 @@ namespace BookStore.Controllers
 
         //Edit method
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int? id)
         {
             if(id == null)
@@ -65,6 +67,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(Book book)
         {
             if (ModelState.IsValid)
@@ -79,6 +82,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult List()
         {
             var books = _db.Books.Include(ct=>ct.Categories).ToList();
@@ -87,6 +91,7 @@ namespace BookStore.Controllers
 
         //For Book details
         [HttpGet]
+        [Authorize]
         public IActionResult Details(int? id)
         {
             if (id != null)
@@ -100,6 +105,7 @@ namespace BookStore.Controllers
 
         //Delete method
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int? id)
         {

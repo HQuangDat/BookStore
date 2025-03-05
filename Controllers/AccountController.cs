@@ -110,6 +110,7 @@ namespace BookStore.Controllers
 
         //For Delete
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int? id)
         {
@@ -127,6 +128,7 @@ namespace BookStore.Controllers
 
         //For list
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult List()
         {
             var listAccount = _db.Accounts.ToList();
