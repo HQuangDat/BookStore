@@ -12,23 +12,25 @@
                 <th>Book Name</th>
                 <th>Image</th>
                 <th>Quantity</th>
+                <th>Price</th>
                 <th class="text-center">Actions</th>
                 <th class="text-center">Remove</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="cartBody">
             @foreach (var item in Model)
             {
-                <tr>
+                <tr data-id="@item.BookId">
                     <td>@Html.DisplayFor(modelItem => item.Book.BookName)</td>
                     <td>
                         <img src="@Html.DisplayFor(modelItem => item.Book.ImagePath)" alt="Book Image" class="img-thumbnail" style="width: 80px; height: auto;">
                     </td>
-                    <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                    <td class="quantity">@Html.DisplayFor(modelItem => item.Quantity)</td>
+                    <td class="price">@Html.DisplayFor(modelItem => item.Book.Price)</td>
                     <td class="text-center">
-                        <!-- Increase/Decrease Quantity (You will handle the logic) -->
-                        <button class="btn btn-outline-secondary">-</button>
-                        <button class="btn btn-outline-secondary">+</button>
+                        <button class="btn btn-outline-secondary decrease">-</button>
+                        <span class="mx-2 quantity-value">@item.Quantity</span>
+                        <button class="btn btn-outline-secondary increase">+</button>
                     </td>
                     <td class="text-center">
                         <form asp-action="Delete" asp-route-id="@item.BookId" method="post">
@@ -41,9 +43,57 @@
             }
         </tbody>
     </table>
+
+    <div class="d-flex justify-content-end align-items-center mt-4">
+        <h4 class="me-3">Total Amount: </h4>
+        <h4 id="totalAmount" class="fw-bold text-primary">$0.00</h4>
+    </div>
+
     <div class="d-flex justify-content-between mt-4">
         <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
             <i class="bi bi-arrow-left"></i> Continue Shopping
         </a>
+        <button class="btn btn-success">
+            <i class="bi bi-credit-card"></i> Checkout
+        </button>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        updateTotal();
+
+        document.querySelectorAll(".increase").forEach(button => {
+            button.addEventListener("click", function () {
+                let row = this.closest("tr");
+                let quantity = row.querySelector(".quantity-value");
+                let newQuantity = parseInt(quantity.textContent) + 1;
+                quantity.textContent = newQuantity;
+                row.querySelector(".quantity").textContent = newQuantity;
+                updateTotal();
+            });
+        });
+
+        document.querySelectorAll(".decrease").forEach(button => {
+            button.addEventListener("click", function () {
+                let row = this.closest("tr");
+                let quantity = row.querySelector(".quantity-value");
+                let newQuantity = Math.max(1, parseInt(quantity.textContent) - 1);
+                quantity.textContent = newQuantity;
+                row.querySelector(".quantity").textContent = newQuantity;
+                updateTotal();
+            });
+        });
+
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll("#cartBody tr").forEach(row => {
+                let price = parseFloat(row.querySelector(".price").textContent.replace("$", ""));
+                let quantity = parseInt(row.querySelector(".quantity").textContent);
+                total += price * quantity;
+            });
+            document.getElementById("totalAmount").textContent = "$" + total.toFixed(2);
+        }
+    });
+</script>
+

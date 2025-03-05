@@ -50,5 +50,21 @@ namespace BookStore.Controllers
             var listCart = _db.Carts.Include(bk=>bk.Book).Where(id=> id.AccountId.ToString() == userId).ToList();
             return View(listCart);
         }
+
+        //Delete item in cart
+        [HttpPost]
+        public IActionResult Delete(int? id)
+        {
+            if(id != null)
+            {
+                Cart cart = _db.Carts.FirstOrDefault(bk=>bk.BookId == id);
+                _db.Carts.Remove(cart);
+                _db.SaveChanges();
+                TempData["success"] = "Success";
+                return RedirectToAction("Index");
+            }
+            TempData["error"] = "Remove item failed";
+            return RedirectToAction("Index");
+        }
     }
 }
