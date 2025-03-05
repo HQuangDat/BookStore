@@ -20,28 +20,46 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Add(int? id)
         {
-            if(id != null)
+            if (id == null)
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var cartBook = _db.Books.Find(id);
-                if(userId != null && cartBook != null)
-                {
-                    var cart = new Cart
-                    {
-                        AccountId = int.Parse(userId),
-                        BookId = id.Value
-                    };
-                    _db.Carts.Add(cart);
-                    TempData["success"] = "Add to cart successfully";
-                    _db.SaveChanges();
-                }
-                else
-                {
-                    TempData["error"] = "Invalid book or user";
-                }
+                TempData["error"] = "Invalid book ID";
+                return RedirectToAction("Index");
             }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var cartBook = _db.Books.Find(id);
+
+            if (userId == null || cartBook == null)
+            {
+                TempData["error"] = "Invalid book or user";
+                return RedirectToAction("Index");
+            }
+
+            int accountId = int.Parse(userId);
+            var existingCartItem = _db.Carts.FirstOrDefault(c => c.AccountId == accountId && c.BookId == id);
+
+            if (existingCartItem != null)
+            {
+                existingCartItem.Quantity += 1;
+                _db.Carts.Update(existingCartItem);
+            }
+            else
+            {
+                // Add new item to cart
+                var cart = new Cart
+                {
+                    AccountId = accountId,
+                    BookId = id.Value
+                };
+                _db.Carts.Add(cart);
+            }
+
+            _db.SaveChanges();
+            TempData["success"] = "Added to cart successfully";
+
             return RedirectToAction("Index");
         }
+
         //Show item in Cart
         [HttpGet]
         public IActionResult Index()

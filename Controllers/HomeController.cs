@@ -1,19 +1,22 @@
 using System.Diagnostics;
+using BookStore.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    private readonly ApplicationDbContext _db;
+    public HomeController(ApplicationDbContext db)
     {
-        _logger = logger;
+        _db = db;
     }
+
 
     public IActionResult Index()
     {
-        return View();
+        var indexBook = _db.Books.ToList();
+        return View(indexBook);
     }
 }
