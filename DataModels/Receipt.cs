@@ -18,6 +18,8 @@ public partial class Receipt
     [Unicode(false)]
     public string? PaymentType { get; set; }
 
+    public decimal TotalAmount { get; set; }
+
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
 
