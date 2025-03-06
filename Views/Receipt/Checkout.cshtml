@@ -52,11 +52,18 @@
 
                 <!-- Confirm Purchase Button -->
                 <div class="card-footer text-center bg-white">
-                    <form asp-controller="Receipt" asp-action="ConfirmPurchase" method="post">
+                    <form asp-controller="Receipt" asp-action="ConfirmCheckout" method="post">
                         @Html.AntiForgeryToken()
+
+                        @foreach (var item in Model)
+                        {
+                            <input type="hidden" name="CartItems[@Model.IndexOf(item)].BookId" value="@item.BookId" />
+                            <input type="hidden" name="CartItems[@Model.IndexOf(item)].Quantity" value="@item.Quantity" />
+                        }
+
                         <button type="submit" class="btn btn-success btn-lg w-100">
                             <i class="bi bi-credit-card"></i> Confirm Purchase
-                        </button> 
+                        </button>
                     </form>
                 </div>
             </div>

@@ -14,10 +14,6 @@ public partial class Receipt
 
     public int AccountId { get; set; }
 
-    [StringLength(50)]
-    [Unicode(false)]
-    public string? PaymentType { get; set; }
-
     public decimal TotalAmount { get; set; }
 
     [Column(TypeName = "datetime")]

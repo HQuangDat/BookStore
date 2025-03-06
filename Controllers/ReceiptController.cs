@@ -15,7 +15,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [ValidateAntiForgeryToken]
         public IActionResult Checkout()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -36,26 +35,40 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ConfirmCheckout(Cart cart, string paymentType)
+        public IActionResult ConfirmCheckout(List<Cart> CartItems)
         {
+            if (CartItems == null || !CartItems.Any())
+            {
+                TempData["error"] = "Your cart is empty!";
+                return RedirectToAction("Index", "Cart");
+            }
+
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             var checkOut = new Receipt
             {
-                AccountId = cart.AccountId,
-                TotalAmount = _db.Carts.Where(id=>id.AccountId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))).Sum(c=>c.Book.Price * c.Quantity),
-                PaymentType = paymentType,
+                AccountId = userId,
+                TotalAmount = CartItems.Sum(c => _db.Books.First(b => b.BookId == c.BookId).Price * c.Quantity),
             };
             _db.Receipts.Add(checkOut);
-            var receiptItem = new ReceiptItem
+            _db.SaveChanges(); 
+
+            var receiptItems = CartItems.Select(c => new ReceiptItem
             {
                 ReceiptId = checkOut.ReceiptId,
-                BookId = cart.BookId,
-                Quantity = cart.Quantity,
-            };
-            _db.ReceiptItems.Add(receiptItem);
-            _db.Carts.Remove(cart);
+                BookId = c.BookId,
+                Quantity = c.Quantity,
+            }).ToList();
+
+            _db.ReceiptItems.AddRange(receiptItems);
+
+            var cartItemsToRemove = _db.Carts.Where(c => c.AccountId == userId).ToList();
+            _db.Carts.RemoveRange(cartItemsToRemove);
+
             _db.SaveChanges();
             TempData["success"] = "Checkout successfully!";
             return RedirectToAction("Index", "Home");
         }
+
     }
 }
