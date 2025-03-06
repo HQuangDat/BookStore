@@ -90,7 +90,7 @@ namespace BookStore.Migrations
                     b.HasIndex(new[] { "Email" }, "UQ__Account__A9D105349BEE982C")
                         .IsUnique();
 
-                    b.ToTable("Account");
+                    b.ToTable("Account", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Book", b =>
@@ -126,7 +126,7 @@ namespace BookStore.Migrations
                     b.HasKey("BookId")
                         .HasName("PK__Book__3DE0C2075FE3A1F9");
 
-                    b.ToTable("Book");
+                    b.ToTable("Book", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Cart", b =>
@@ -146,7 +146,7 @@ namespace BookStore.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Category", b =>
@@ -166,7 +166,7 @@ namespace BookStore.Migrations
                     b.HasKey("CategoryId")
                         .HasName("PK__Category__19093A0B06D26FF6");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Receipt", b =>
@@ -198,7 +198,7 @@ namespace BookStore.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.ToTable("Receipt");
+                    b.ToTable("Receipt", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.DataModels.ReceiptItem", b =>
@@ -218,7 +218,7 @@ namespace BookStore.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("ReceiptItems");
+                    b.ToTable("ReceiptItems", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Role", b =>
@@ -238,7 +238,7 @@ namespace BookStore.Migrations
                     b.HasKey("RoleId")
                         .HasName("PK__Role__8AFACE1A31DA8E39");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.DataModels.Warehouse", b =>
@@ -260,7 +260,7 @@ namespace BookStore.Migrations
                     b.HasKey("WarehouseId")
                         .HasName("PK__Warehous__2608AFF9415FE8BF");
 
-                    b.ToTable("Warehouse");
+                    b.ToTable("Warehouse", (string)null);
                 });
 
             modelBuilder.Entity("BookWarehouse", b =>

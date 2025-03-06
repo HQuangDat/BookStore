@@ -15,6 +15,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public IActionResult Checkout()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -31,6 +32,30 @@ namespace BookStore.Controllers
                 return RedirectToAction("Index", "Home");
             }
             return View(cartCheckout);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmCheckout(Cart cart, string paymentType)
+        {
+            var checkOut = new Receipt
+            {
+                AccountId = cart.AccountId,
+                TotalAmount = _db.Carts.Where(id=>id.AccountId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))).Sum(c=>c.Book.Price * c.Quantity),
+                PaymentType = paymentType,
+            };
+            _db.Receipts.Add(checkOut);
+            var receiptItem = new ReceiptItem
+            {
+                ReceiptId = checkOut.ReceiptId,
+                BookId = cart.BookId,
+                Quantity = cart.Quantity,
+            };
+            _db.ReceiptItems.Add(receiptItem);
+            _db.Carts.Remove(cart);
+            _db.SaveChanges();
+            TempData["success"] = "Checkout successfully!";
+            return RedirectToAction("Index", "Home");
         }
     }
 }
