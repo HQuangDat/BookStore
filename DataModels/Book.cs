@@ -34,8 +34,8 @@ public partial class Book
     [InverseProperty("Book")]
     public virtual ICollection<ReceiptItem> ReceiptItems { get; set; } = new List<ReceiptItem>();
 
-    [ForeignKey("BookId")]
-    public virtual ICollection<Warehouse> Warehouses { get; set; } = new List<Warehouse>();
+    [InverseProperty("Book")]
+    public virtual ICollection<BookWarehouse> BookWarehouses { get; set; } = new List<BookWarehouse>();
 
     [ForeignKey("BookId")]
     [InverseProperty("Books")]

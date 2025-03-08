@@ -54,22 +54,6 @@ namespace BookStore.Data
             {
                 entity.HasKey(e => e.BookId).HasName("PK__Book__3DE0C2075FE3A1F9");
 
-                entity.HasMany(b => b.Warehouses)
-                .WithMany(w => w.Books)
-                .UsingEntity<Dictionary<string, object>>(
-                    "BookWarehouse",  
-                    b => b.HasOne<Warehouse>().WithMany().HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK_BookWarehouse_Warehouse"),
-                    w => w.HasOne<Book>().WithMany().HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK_BookWarehouse_Book"),
-                    j =>
-                    {
-                        j.HasKey("BookId", "WarehouseId");
-                        j.ToTable("BookWarehouse"); 
-                    });
-
                 entity.HasMany(d => d.Categories).WithMany(p => p.Books)
                     .UsingEntity<Dictionary<string, object>>(
                         "BookCategory",
@@ -144,6 +128,26 @@ namespace BookStore.Data
             modelBuilder.Entity<Warehouse>(entity =>
             {
                 entity.HasKey(e => e.WarehouseId).HasName("PK__Warehous__2608AFF9415FE8BF");
+            });
+
+            modelBuilder.Entity<BookWarehouse>(entity =>
+            {
+                entity.ToTable("BookWarehouse");
+                entity.HasKey(e => new { e.BookId, e.WarehouseId }); // Composite key
+
+                entity.Property(e => e.Quantity).HasDefaultValue(1);
+
+                entity.HasOne(d => d.Book)
+                    .WithMany(p => p.BookWarehouses)
+                    .HasForeignKey(d => d.BookId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_BookWarehouse_Book");
+
+                entity.HasOne(d => d.Warehouse)
+                    .WithMany(p => p.BookWarehouses)
+                    .HasForeignKey(d => d.WarehouseId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_BookWarehouse_Warehouse");
             });
 
             OnModelCreatingPartial(modelBuilder);

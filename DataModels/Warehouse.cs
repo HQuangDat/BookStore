@@ -16,9 +16,6 @@ public partial class Warehouse
     [StringLength(255)]
     public string location { get; set; } = null!;
 
-    public int? Remaining { get; set; }
-
-    [ForeignKey("WarehouseId")]
-    [InverseProperty("Warehouses")]
-    public virtual ICollection<Book> Books { get; set; } = new List<Book>();
+    [InverseProperty("Warehouse")]
+    public virtual ICollection<BookWarehouse> BookWarehouses { get; set; } = new List<BookWarehouse>();
 }
