@@ -25,6 +25,7 @@ namespace BookStore.Data
         public virtual DbSet<Role> Roles { get; set; }
 
         public virtual DbSet<Warehouse> Warehouses { get; set; }
+        public virtual DbSet<BookWarehouse> BookWarehouses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

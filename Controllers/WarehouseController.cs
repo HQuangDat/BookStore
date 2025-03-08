@@ -2,6 +2,8 @@
 using BookStore.DataModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace BookStore.Controllers
 {
@@ -69,6 +71,48 @@ namespace BookStore.Controllers
         {
             var warehouses = _db.Warehouses.ToList();
             return View(warehouses);
+        }
+
+        //Book and warehouse function
+        [HttpGet]
+        public IActionResult AddToWarehouse()
+        {
+            var availBooks = _db.Books.ToList();
+            var availWarehouses = _db.Warehouses.ToList();  
+            ViewBag.AvailableBooks = new SelectList(availBooks, "BookId", "BookName");
+            ViewBag.AvailableWarehouses = new SelectList(availWarehouses, "WarehouseId", "location");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddToWarehouse(int? bookId, int? warehouseId,int quantity)
+        {
+            try
+            {
+                if (bookId != null && warehouseId != null)
+                {
+                    BookWarehouse bh = new BookWarehouse
+                    {
+                        BookId = bookId.Value,
+                        WarehouseId = warehouseId.Value,
+                        Quantity = quantity
+                    };
+                    _db.BookWarehouses.Add(bh);
+                    _db.SaveChanges();
+                    TempData["success"] = "Book added to warehouse successfully!";
+                    return RedirectToAction("List");
+                }
+            }
+            catch (Exception e)
+            {
+                TempData["error"] = $"{e.Message}, please check the information";
+            }
+            var availBooks = _db.Books.ToList();
+            var availWarehouses = _db.Warehouses.ToList();
+            ViewBag.AvailableBooks = new SelectList(availBooks, "BookId", "BookName");
+            ViewBag.AvailableWarehouses = new SelectList(availWarehouses, "WarehouseId", "location");
+            return RedirectToAction("AddToWarehouse");
         }
     }
 }
