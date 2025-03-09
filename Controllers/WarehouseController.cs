@@ -3,6 +3,7 @@ using BookStore.DataModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace BookStore.Controllers
@@ -113,6 +114,15 @@ namespace BookStore.Controllers
             ViewBag.AvailableBooks = new SelectList(availBooks, "BookId", "BookName");
             ViewBag.AvailableWarehouses = new SelectList(availWarehouses, "WarehouseId", "location");
             return RedirectToAction("AddToWarehouse");
+        }
+
+        [HttpGet]
+        public IActionResult ListQuantity()
+        {
+            var warehouses = _db.BookWarehouses
+                .Include(bk=>bk.Book)
+                .Include(wh=>wh.Warehouse).ToList();
+            return View(warehouses);
         }
     }
 }
