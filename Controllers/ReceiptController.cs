@@ -1,11 +1,13 @@
 ﻿using BookStore.Data;
 using BookStore.DataModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BookStore.Controllers
 {
+    [Authorize]
     public class ReceiptController : Controller
     {
         private readonly ApplicationDbContext _db;
