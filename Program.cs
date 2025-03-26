@@ -3,6 +3,7 @@ using BookStore.DataModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace BookStore
 {
@@ -19,7 +20,16 @@ namespace BookStore
 
             builder.Services.AddScoped < IPasswordHasher<Account>, PasswordHasher<Account>>();
 
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
+                .AddGoogle(options =>
+                {
+                    options.ClientId = "GoogleKey:ClientId";
+                    options.ClientSecret = "GoogleKey:ClientSecret";
+                })
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/Account/Login";
@@ -33,6 +43,7 @@ namespace BookStore
                 options.AddPolicy("User", policy => policy.RequireRole("User"));
                 options.AddPolicy("Saler", policy => policy.RequireRole("Saler"));
             });
+
 
             var app = builder.Build();
 

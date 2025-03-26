@@ -9,6 +9,7 @@ using NuGet.Versioning;
 using System.Security.Claims;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Google;
 
 
 namespace BookStore.Controllers
@@ -29,6 +30,23 @@ namespace BookStore.Controllers
         {
             return View();
         }
+
+        //OAuth2 Login
+        public async Task GoogleLogin()
+        {
+            await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("GoogleResponse")
+            });
+        }
+
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var claims = result.Principal.Identities.FirstOrDefault().Claims.ToList();
+            return Json(claims);
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
