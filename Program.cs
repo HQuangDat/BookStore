@@ -27,8 +27,8 @@ namespace BookStore
             })
                 .AddGoogle(options =>
                 {
-                    options.ClientId = "GoogleKey:ClientId";
-                    options.ClientSecret = "GoogleKey:ClientSecret";
+                    options.ClientId = builder.Configuration.GetSection("GoogleKey:ClientId").Value;
+                    options.ClientSecret = builder.Configuration.GetSection("GoogleKey:ClientSecret").Value;
                 })
                 .AddCookie(options =>
                 {
