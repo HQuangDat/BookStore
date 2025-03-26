@@ -43,7 +43,14 @@ namespace BookStore.Controllers
         public async Task<IActionResult> GoogleResponse()
         {
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            var claims = result.Principal.Identities.FirstOrDefault().Claims.ToList();
+            var claims = result.Principal.Identities.FirstOrDefault().Claims.Select(claims => new
+            {
+                claims.Issuer,
+                claims.OriginalIssuer,
+                claims.Type,
+                claims.Value
+            });
+
             return Json(claims);
         }
 
