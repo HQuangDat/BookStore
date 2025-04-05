@@ -156,5 +156,6 @@ namespace BookStore.Data
 
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        public DbSet<BookStore.DataModels.PasswordReset> PasswordReset { get; set; } = default!;
     }
 }

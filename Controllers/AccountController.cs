@@ -10,6 +10,8 @@ using System.Security.Claims;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Google;
+using System.Net.Mail;
+using System.Net;
 
 
 namespace BookStore.Controllers
@@ -158,6 +160,88 @@ namespace BookStore.Controllers
         {
             var listAccount = _db.Accounts.ToList();
             return View(listAccount);
+        }
+
+
+        //Forgot Password
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var user = await _db.Accounts.FirstOrDefaultAsync(u => u.Email == email);
+            if(user == null)
+            {
+                TempData["error"] = "Email not found!";
+                return View();
+            }
+            // Generate a password reset token
+            string token = Guid.NewGuid().ToString();
+            _db.PasswordReset.Add(new PasswordReset
+            {
+                Email = email,
+                Token = token,
+                ExpireDate = DateTime.UtcNow.AddHours(1)
+            });
+            _db.SaveChanges();
+
+            // Send email 
+
+
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token)
+        {
+            var passwordReset = _db.PasswordReset.FirstOrDefault(p => p.Token == token);
+            if(passwordReset == null || passwordReset.ExpireDate < DateTime.UtcNow)
+            {
+                TempData["error"] = "Invalid or expired token!";
+                return Content("Invalid or expired token!");
+            }
+            return View(model:token);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(string token, string newpassword)
+        {
+            var passwordReset = _db.PasswordReset.FirstOrDefault(p => p.Token == token);
+            if (passwordReset == null || passwordReset.ExpireDate < DateTime.UtcNow)
+            {
+                TempData["error"] = "Invalid or expired token!";
+                return Content("Invalid or expired token!");
+            }
+            var user = await _db.Accounts.FirstOrDefaultAsync(u => u.Email == passwordReset.Email);
+            if(user != null)
+            {
+                user.Password = _passwordHasher.HashPassword(user, user.Password);
+                _db.PasswordReset.Remove(passwordReset);
+                _db.SaveChanges();
+            }
+            return RedirectToAction("Login");
+        }
+
+        //Send Email method
+        public async Task<IActionResult> SendEmail(string email, string resetLink)
+        {
+            var message = new MailMessage();
+            message.To.Add(new MailAddress(email));
+            message.Subject = "Reset your account password!";
+            message.Body = $"<p>Click <a href='{resetLink}'>here</a> to reset your password.</p>";
+            message.IsBodyHtml = true;
+            message.From = new MailAddress("hoquangdat123@gmail.com");
+            using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+            {
+                smtp.Credentials = new NetworkCredential("@gmail.com", "password");
+                smtp.EnableSsl = true;
+                await smtp.SendMailAsync(message);
+            }
+            return Content("Email sent successfully!");
         }
     }
 }
