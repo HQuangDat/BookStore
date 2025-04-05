@@ -190,7 +190,8 @@ namespace BookStore.Controllers
             _db.SaveChanges();
 
             // Send email 
-
+            var resetLink = Url.Action("ResetPassword", "Account", new { token = token }, Request.Scheme);
+            await SendEmail(email, resetLink);
 
             return View();
         }
