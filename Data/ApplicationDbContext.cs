@@ -26,6 +26,7 @@ namespace BookStore.Data
 
         public virtual DbSet<Warehouse> Warehouses { get; set; }
         public virtual DbSet<BookWarehouse> BookWarehouses { get; set; }
+        public virtual DbSet<PasswordReset> PasswordResets { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,7 +105,7 @@ namespace BookStore.Data
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Account).WithMany(p => p.Receipts)
-                    .OnDelete(DeleteBehavior.Restrict) // Prevent deleting an Account if Receipts exist
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Receipt_Account");
             });
 

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Google;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 
 namespace BookStore.Controllers
@@ -147,7 +148,7 @@ namespace BookStore.Controllers
                 _db.Accounts.Remove(user);
                 _db.SaveChanges();
                 TempData["success"] = "Delete successfully!";
-                return RedirectToAction("Login");
+                return RedirectToAction("List");
             }
             TempData["error"] = "User not found";
             return NotFound();
@@ -162,6 +163,19 @@ namespace BookStore.Controllers
             return View(listAccount);
         }
 
+        //Account details
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Details(int id)
+        {
+            var user = _db.Accounts.Include(rol=>rol.Roles).FirstOrDefault(u => u.AccountId == id);
+            if(user == null)
+            {
+                TempData["error"] = "User not found!";
+                return RedirectToAction("List");
+            }
+            return View(user);
+        }
 
         //Forgot Password
         [HttpGet]
@@ -171,6 +185,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
         {
             var user = await _db.Accounts.FirstOrDefaultAsync(u => u.Email == email);
@@ -193,7 +208,7 @@ namespace BookStore.Controllers
             var resetLink = Url.Action("ResetPassword", "Account", new { token = token }, Request.Scheme);
             await SendEmail(email, resetLink);
 
-            return View();
+            return RedirectToAction("Login");
         }
 
         [HttpGet]
@@ -220,11 +235,15 @@ namespace BookStore.Controllers
             var user = await _db.Accounts.FirstOrDefaultAsync(u => u.Email == passwordReset.Email);
             if(user != null)
             {
-                user.Password = _passwordHasher.HashPassword(user, user.Password);
+                user.Password = _passwordHasher.HashPassword(user, newpassword);
                 _db.PasswordReset.Remove(passwordReset);
                 _db.SaveChanges();
+                TempData["success"] = "Password changed successfully!";
+                return RedirectToAction("Login");
             }
+            TempData["error"] = "User not found!";
             return RedirectToAction("Login");
+            
         }
 
         //Send Email method
@@ -238,10 +257,11 @@ namespace BookStore.Controllers
             message.From = new MailAddress("hoquangdat123@gmail.com");
             using (var smtp = new SmtpClient("smtp.gmail.com", 587))
             {
-                smtp.Credentials = new NetworkCredential("@gmail.com", "password");
+                smtp.Credentials = new NetworkCredential("hoquangdat123@gmail.com", "vpkp ssdb coam qfxp");
                 smtp.EnableSsl = true;
                 await smtp.SendMailAsync(message);
             }
+            TempData["success"] = "Email sent successfully";
             return Content("Email sent successfully!");
         }
     }
