@@ -42,13 +42,12 @@ namespace BookStore.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            var warehouse = _db.Warehouses.Find(id);
-            if (warehouse == null)
+            if (id == null)
             {
                 TempData["error"] = "Warehouse not found!";
                 return RedirectToAction("List");
             }
-            _db.Warehouses.Update(warehouse);
+            var warehouse = _db.Warehouses.Find(id);
             return View(warehouse);
         }
 
@@ -141,7 +140,6 @@ namespace BookStore.Controllers
             return RedirectToAction("List");
         }
 
-
         //Edit Book-Warehouse 
         [HttpGet]
         public IActionResult EditQuantity(int? Warehouseid, int? BookId)
@@ -155,7 +153,7 @@ namespace BookStore.Controllers
                 .Include(bk => bk.Book)
                 .Include(wh => wh.Warehouse)
                 .FirstOrDefault(bw => bw.WarehouseId == Warehouseid && bw.BookId == BookId);
-            if (bwh!=null)
+            if (bwh != null)
             {
                 return View(bwh);
             }
