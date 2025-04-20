@@ -122,6 +122,34 @@ namespace BookStore.Controllers
         }
 
 
+        //Grant Admin Role for User
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult GrantAdminRole(int id)
+        {
+            var user = _db.Accounts.Include(rl=>rl.Roles).FirstOrDefault(u => u.AccountId == id);
+            if (user!=null)
+            {
+                var adminRole = _db.Roles.Find(1);
+                if(adminRole == null)
+                {
+                    TempData["error"] = "Admin role not found!";
+                    return RedirectToAction("List");
+                }
+                if (user.Roles.Any(r => r.RoleId == 1 || r.RoleName == "Admin"))
+                {
+                    TempData["error"] = "User already has admin role!";
+                    return RedirectToAction("List");
+                }
+                user.Roles.Add(adminRole);
+                _db.SaveChanges();
+                TempData["success"] = "Grant admin role successfully!";
+                return RedirectToAction("List");
+            }
+            TempData["error"] = "User not found!";
+            return RedirectToAction("List");
+        }
+
         //For Forgot Password
         [HttpGet]
         public IActionResult Forgot()

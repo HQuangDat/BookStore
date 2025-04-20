@@ -3,35 +3,50 @@
 @{
     ViewData["Title"] = "Account Details";
 }
-@if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 {
-    <section class="vh-100 d-flex align-items-center justify-content-center bg-light">
+    <section class="py-5 bg-light">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-10 col-lg-8">
-                    <div class="card shadow-lg border-0 rounded-4">
-                        <div class="card-header bg-dark text-white text-center rounded-top-4">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-header bg-primary text-white text-center rounded-top-4">
                             <h2 class="mb-0">Account Details</h2>
                         </div>
-                        <div class="card-body p-5">
-                            <dl class="row mb-0">
-                                <dt class="col-sm-4 text-muted">Username</dt>
-                                <dd class="col-sm-8">@Html.DisplayFor(model => model.Username)</dd>
-
-                                <dt class="col-sm-4 text-muted">Password</dt>
-                                <dd class="col-sm-8 text-danger">••••••••</dd>
-
-                                <dt class="col-sm-4 text-muted">Email</dt>
-                                <dd class="col-sm-8">@Html.DisplayFor(model => model.Email)</dd>
-
-                                <dt class="col-sm-4 text-muted">Address</dt>
-                                <dd class="col-sm-8">@Html.DisplayFor(model => model.Address)</dd>
-                                <dt class="col-sm-4 text-muted">Role</dt>
-                                @foreach (var role in Model.Roles)
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Username</label>
+                                <div class="fw-semibold">@Model.Username</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Password</label>
+                                <div class="text-danger">••••••••</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Email</label>
+                                <div class="fw-semibold">@Model.Email</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Address</label>
+                                <div class="fw-semibold">@Model.Address</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Roles</label>
+                                @if (Model.Roles != null && Model.Roles.Any())
                                 {
-                                    <dd class="col-sm-8">@Html.DisplayFor(model => role.RoleName)</dd>
-                                })
-                            </dl>
+                                    <ul class="list-unstyled mb-0">
+                                        @foreach (var role in Model.Roles)
+                                        {
+                                            <li class="badge bg-secondary me-1">@role.RoleName</li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No roles assigned.</div>
+                                }
+                            </div>
                         </div>
                         <div class="card-footer bg-white text-center">
                             <a asp-action="List" class="btn btn-outline-secondary px-4">Back to List</a>
@@ -44,6 +59,9 @@
 }
 else
 {
-    <h1>You need to login!</h1>
+    <div class="container py-5">
+        <div class="alert alert-warning text-center" role="alert">
+            You need to log in as an admin to view this page.
+        </div>
+    </div>
 }
-

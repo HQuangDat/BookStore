@@ -124,5 +124,20 @@ namespace BookStore.Controllers
                 .Include(wh=>wh.Warehouse).ToList();
             return View(warehouses);
         }
+
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            var delWare = _db.Warehouses.FirstOrDefault(wh=>wh.WarehouseId == id);
+            if(delWare!=null)
+            {
+               _db.Warehouses.Remove(delWare);
+               _db.SaveChanges();
+               TempData["success"] = "Delete Warehouse successfully";
+               return RedirectToAction("List");
+            }
+            TempData["error"] = "Warehouse doesn't exist!";
+            return RedirectToAction("List");
+        }
     }
 }

@@ -1,17 +1,20 @@
 ﻿@model IEnumerable<BookStore.DataModels.Account>
 
 @{
-    ViewData["Title"] = "List";
+    ViewData["Title"] = "Account List";
 }
 
-@if(User.Identity.IsAuthenticated)
+@if (User.Identity.IsAuthenticated)
 {
-    <div class="container mt-4">
-        <!-- Optional: Search Bar -->
+    <div class="container py-5">
+        <h2 class="mb-4">Account List</h2>
+
+        <!-- Search Bar -->
         <div class="mb-3">
             <input type="text" class="form-control" id="searchInput" placeholder="Search accounts..." onkeyup="searchTable()">
         </div>
 
+        <!-- Account Table -->
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered align-middle">
                 <thead class="table-dark">
@@ -34,16 +37,22 @@
                             <td>@item.Email</td>
                             <td>@item.Address</td>
                             <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@item.AccountId" class="btn btn-warning btn-sm">
+                                <a asp-action="Edit" asp-route-id="@item.AccountId" class="btn btn-warning btn-sm me-1">
                                     <i class="bi bi-pencil-square"></i> Edit
                                 </a>
-                                <a asp-action="Details" asp-route-id="@item.AccountId" class="btn btn-info btn-sm text-white">
+                                <a asp-action="Details" asp-route-id="@item.AccountId" class="btn btn-info btn-sm text-white me-1">
                                     <i class="bi bi-eye"></i> Details
                                 </a>
-                                <form asp-action="Delete" asp-route-id="@item.AccountId" method="post" style="display:inline;">
+                                <form asp-action="Delete" asp-route-id="@item.AccountId" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this account?');">
+                                    <button type="submit" class="btn btn-danger btn-sm me-1" onclick="return confirm('Are you sure you want to delete this account?');">
                                         <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                                <form asp-action="GrantAdminRole" asp-route-id="@item.AccountId" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to grant admin role to this account?');">
+                                        <i class="bi bi-person-plus-fill"></i> Grant Admin
                                     </button>
                                 </form>
                             </td>
@@ -68,6 +77,9 @@
 }
 else
 {
-    <h1>You are not supposed to be here</h1>
+    <div class="container py-5">
+        <div class="alert alert-warning text-center" role="alert">
+            You need to log in to view this page.
+        </div>
+    </div>
 }
-
