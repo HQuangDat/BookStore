@@ -31,13 +31,10 @@
                             <td>@item.Book.BookName</td>
                             <td>@item.Warehouse.location</td>
                             <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-sm btn-warning">
+                                <a asp-action="EditQuantity" asp-route-Warehouseid="@item.Warehouse.WarehouseId" asp-route-Bookid="@item.Book.BookId" class="btn btn-sm btn-warning">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
-                                <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-sm btn-info text-white">
-                                    <i class="bi bi-eye"></i> Details
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-sm btn-danger">
+                                <a asp-action="Delete" asp-route-Warehouseid="@item.Warehouse.WarehouseId" asp-route-Bookid="@item.Book.BookId" class="btn btn-sm btn-danger">
                                     <i class="bi bi-trash"></i> Delete
                                 </a>
                             </td>

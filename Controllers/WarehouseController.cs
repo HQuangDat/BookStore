@@ -42,12 +42,13 @@ namespace BookStore.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            if (id == null)
+            var warehouse = _db.Warehouses.Find(id);
+            if (warehouse == null)
             {
                 TempData["error"] = "Warehouse not found!";
                 return RedirectToAction("List");
             }
-            var warehouse = _db.Warehouses.Find(id);
+            _db.Warehouses.Update(warehouse);
             return View(warehouse);
         }
 
@@ -137,6 +138,45 @@ namespace BookStore.Controllers
                return RedirectToAction("List");
             }
             TempData["error"] = "Warehouse doesn't exist!";
+            return RedirectToAction("List");
+        }
+
+
+        //Edit Book-Warehouse 
+        [HttpGet]
+        public IActionResult EditQuantity(int? Warehouseid, int? BookId)
+        {
+            if (Warehouseid == null || BookId == null)
+            {
+                TempData["error"] = "Warehouse or Book not found!";
+                return RedirectToAction("List");
+            }
+            var bwh = _db.BookWarehouses
+                .Include(bk => bk.Book)
+                .Include(wh => wh.Warehouse)
+                .FirstOrDefault(bw => bw.WarehouseId == Warehouseid && bw.BookId == BookId);
+            if (bwh!=null)
+            {
+                return View(bwh);
+            }
+            TempData["error"] = "Warehouse or Book not found!";
+            return RedirectToAction("List");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditQuantity(BookWarehouse bwh)
+        {
+            var existingBwh = _db.BookWarehouses
+                                .FirstOrDefault(bw => bw.WarehouseId == bwh.WarehouseId && bw.BookId == bwh.BookId);
+            if (existingBwh != null)
+            {
+                existingBwh.Quantity = bwh.Quantity;
+                _db.SaveChanges();
+                TempData["success"] = "Book quantity updated successfully!";
+                return RedirectToAction("List");
+            }
+            TempData["error"] = "Book not found in the warehouse!";
             return RedirectToAction("List");
         }
     }
