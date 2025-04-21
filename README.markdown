@@ -133,18 +133,12 @@ Contributions are welcome! To contribute:
 4. Push to the branch (`git push origin feature/your-feature`).
 5. Open a Pull Request.
 
-## License 📜
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ## Contact 📩
 
 For questions or support, contact:
 
 - **Author**: Ho Quang Dat
 - **GitHub**: HQuangDat
-- **Email**: \[Your email, if you wish to include it\]
+- **Email**: \hoquangdat123@gmail.com
 
 ---
-
-Happy coding! 🚀
