@@ -1,99 +1,118 @@
 ﻿@model IEnumerable<BookStore.DataModels.Cart>
 
 @{
-    ViewData["Title"] = "Cart item";
+    ViewData["Title"] = "Shopping Cart";
+    var isEmpty = !Model.Any();
 }
 
-<div class="container mt-5">
-    <h1 class="mb-4">Shopping Cart</h1>
-    <table class="table table-hover align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Book Name</th>
-                <th>Image</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th class="text-center">Actions</th>
-                <th class="text-center">Remove</th>
-            </tr>
-        </thead>
-        <tbody id="cartBody">
-            @foreach (var item in Model)
-            {
-                <tr data-id="@item.BookId">
-                    <td>@Html.DisplayFor(modelItem => item.Book.BookName)</td>
-                    <td>
-                        <img src="@Html.DisplayFor(modelItem => item.Book.ImagePath)" alt="Book Image" class="img-thumbnail" style="width: 80px; height: auto;">
-                    </td>
-                    <td class="quantity">@Html.DisplayFor(modelItem => item.Quantity)</td>
-                    <td class="price">@Html.DisplayFor(modelItem => item.Book.Price)</td>
-                    <td class="text-center">
-                        <button class="btn btn-outline-secondary decrease">-</button>
-                        <span class="mx-2 quantity-value">@item.Quantity</span>
-                        <button class="btn btn-outline-secondary increase">+</button>
-                    </td>
-                    <td class="text-center">
-                        <form asp-action="Delete" asp-route-id="@item.BookId" method="post">
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Remove this item from cart?');">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="container py-5">
+    <h1 class="text-center mb-5 display-5">🛒 Your Shopping Cart</h1>
 
-    <div class="d-flex justify-content-end align-items-center mt-4">
-        <h4 class="me-3">Total Amount: </h4>
-        <h4 id="totalAmount" class="fw-bold text-primary">$0.00</h4>
-    </div>
+    @if (isEmpty)
+    {
+        <div class="text-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png" alt="Empty Cart" style="max-width: 300px;" />
+            <h4 class="mt-4 text-muted">Your cart is currently empty.</h4>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">
+                <i class="bi bi-arrow-left"></i> Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered shadow-sm align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Book</th>
+                        <th>Image</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Update</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody id="cartBody">
+                    @foreach (var item in Model)
+                    {
+                        <tr data-id="@item.BookId">
+                            <td>@item.Book.BookName</td>
+                            <td class="text-center">
+                                <img src="@item.Book.ImagePath" alt="Book" class="img-thumbnail rounded" style="width: 60px;" />
+                            </td>
+                            <td class="text-center quantity">@item.Quantity</td>
+                            <td class="price text-center">@item.Book.Price.ToString("C")</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <button class="btn btn-outline-dark decrease">-</button>
+                                    <span class="mx-2 quantity-value">@item.Quantity</span>
+                                    <button class="btn btn-outline-dark increase">+</button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <form asp-action="Delete" asp-route-id="@item.BookId" method="post">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this item from cart?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-    <div class="d-flex justify-content-between mt-4">
-        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
-            <i class="bi bi-arrow-left"></i> Continue Shopping
-        </a>
-        <a asp-controller="Receipt" asp-action="Checkout" class="btn btn-success">
-            <i class="bi bi-credit-card"></i> Checkout
-        </a>
-    </div>
+        <div class="d-flex justify-content-end mt-4">
+            <h4 class="fw-bold text-primary">Total: <span id="totalAmount">$0.00</span></h4>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Continue Shopping
+            </a>
+            <a asp-controller="Receipt" asp-action="Checkout" class="btn btn-success">
+                <i class="bi bi-credit-card"></i> Proceed to Checkout
+            </a>
+        </div>
+    }
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        updateTotal();
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            updateTotal();
 
-        document.querySelectorAll(".increase").forEach(button => {
-            button.addEventListener("click", function () {
-                let row = this.closest("tr");
-                let quantity = row.querySelector(".quantity-value");
-                let newQuantity = parseInt(quantity.textContent) + 1;
-                quantity.textContent = newQuantity;
-                row.querySelector(".quantity").textContent = newQuantity;
-                updateTotal();
+            document.querySelectorAll(".increase").forEach(button => {
+                button.addEventListener("click", function () {
+                    let row = this.closest("tr");
+                    let quantity = row.querySelector(".quantity-value");
+                    let newQuantity = parseInt(quantity.textContent) + 1;
+                    quantity.textContent = newQuantity;
+                    row.querySelector(".quantity").textContent = newQuantity;
+                    updateTotal();
+                });
             });
+
+            document.querySelectorAll(".decrease").forEach(button => {
+                button.addEventListener("click", function () {
+                    let row = this.closest("tr");
+                    let quantity = row.querySelector(".quantity-value");
+                    let newQuantity = Math.max(1, parseInt(quantity.textContent) - 1);
+                    quantity.textContent = newQuantity;
+                    row.querySelector(".quantity").textContent = newQuantity;
+                    updateTotal();
+                });
+            });
+
+            function updateTotal() {
+                let total = 0;
+                document.querySelectorAll("#cartBody tr").forEach(row => {
+                    let price = parseFloat(row.querySelector(".price").textContent.replace(/[^0-9.-]+/g, ""));
+                    let quantity = parseInt(row.querySelector(".quantity").textContent);
+                    total += price * quantity;
+                });
+                document.getElementById("totalAmount").textContent = "$" + total.toFixed(2);
+            }
         });
-
-        document.querySelectorAll(".decrease").forEach(button => {
-            button.addEventListener("click", function () {
-                let row = this.closest("tr");
-                let quantity = row.querySelector(".quantity-value");
-                let newQuantity = Math.max(1, parseInt(quantity.textContent) - 1);
-                quantity.textContent = newQuantity;
-                row.querySelector(".quantity").textContent = newQuantity;
-                updateTotal();
-            });
-        });
-
-        function updateTotal() {
-            let total = 0;
-            document.querySelectorAll("#cartBody tr").forEach(row => {
-                let price = parseFloat(row.querySelector(".price").textContent.replace("$", ""));
-                let quantity = parseInt(row.querySelector(".quantity").textContent);
-                total += price * quantity;
-            });
-            document.getElementById("totalAmount").textContent = "$" + total.toFixed(2);
-        }
-    });
-</script>
-
+    </script>
+}

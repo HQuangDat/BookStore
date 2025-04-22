@@ -28,13 +28,13 @@ namespace BookStore.Controllers
                 .Include(c => c.Account)
                 .Where(c => c.AccountId == int.Parse(userId))
                 .ToList();
-            ViewBag.Address = _db.Accounts.Find(int.Parse(userId)).Address;
-            ViewBag.Email = _db.Accounts.Find(int.Parse(userId)).Email;
-            if (cartCheckout == null)
+            if (cartCheckout == null || !cartCheckout.Any())
             {
                 TempData["error"] = "Cart is empty!";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Cart");
             }
+            ViewBag.Address = _db.Accounts.Find(int.Parse(userId)).Address;
+            ViewBag.Email = _db.Accounts.Find(int.Parse(userId)).Email;
             return View(cartCheckout);
         }
 
