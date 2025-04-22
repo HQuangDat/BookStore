@@ -72,11 +72,10 @@ cd BookStore
 
 4. Add the credentials to your configuration file (`Web.config` or `appsettings.json`):
 
-   ```xml
-   <appSettings>
-     <add key="GoogleClientId" value="your_client_id" />
-     <add key="GoogleClientSecret" value="your_client_secret" />
-   </appSettings>
+   ```
+   "ConnectionStrings": {
+  "DefaultConnection": "Server=HQD;Database=BookStore;Trusted_Connection=true;TrustServerCertificate=true"
+    }
    ```
 
 ### 4. Configure SMTP for Email 📬
@@ -107,7 +106,7 @@ var smtpClient = new SmtpClient("smtp.gmail.com")
 - **Models/**: Defines data models and Entity Framework configurations.
 - **Views/**: Razor views for the user interface.
 - **App_Data/**: May contain database-related files (if applicable).
-- **Web.config**: Configuration file for database connections and Google OAuth2 settings.
+- **appsetting.json**: Configuration file for database connections and Google OAuth2 settings.
 
 ## Usage 🖱️
 
