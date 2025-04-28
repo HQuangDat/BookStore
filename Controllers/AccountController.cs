@@ -61,12 +61,10 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string username, string password)
         {
-            var existUser = await _db.Accounts.Include(role => role.Roles).
-                FirstOrDefaultAsync(name => name.Username == username);
-
+            var existUser = await _accountrepository.getByUsernameAsync(username);
             if (existUser != null)
             {
-                PasswordVerificationResult result = _passwordHasher.VerifyHashedPassword(existUser, existUser.Password, password);
+                PasswordVerificationResult result = _accountrepository.passwordVerificationResult(existUser, existUser.Password, password);
                 if (result == PasswordVerificationResult.Success)
                 {
                     var claims = new List<Claim>
@@ -109,10 +107,8 @@ namespace BookStore.Controllers
         {
             if (ModelState.IsValid)
             {
-                user.Password = _passwordHasher.HashPassword(user, user.Password);
-                user.Roles.Add(_db.Roles.Find(2));
-                _db.Accounts.Add(user);
-                _db.SaveChanges();
+                _accountrepository.createNewUser(user);
+                _accountrepository.Save();
                 TempData["success"] = "Create account success!";
                 return RedirectToAction("Login");
             }
@@ -126,24 +122,22 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult GrantAdminRole(int id)
         {
-            var user = _db.Accounts.Include(rl=>rl.Roles).FirstOrDefault(u => u.AccountId == id);
+            var user = _accountrepository.getById(id);
             if (user!=null)
             {
-                var adminRole = _db.Roles.Find(1);
-                if(adminRole == null)
+                string errorMessage;
+                _accountrepository.GrantAdmin(user, out errorMessage);
+                if(errorMessage!=null)
                 {
-                    TempData["error"] = "Admin role not found!";
+                    TempData["error"] = errorMessage;
                     return RedirectToAction("List");
                 }
-                if (user.Roles.Any(r => r.RoleId == 1 || r.RoleName == "Admin"))
+                else
                 {
-                    TempData["error"] = "User already has admin role!";
+                    _accountrepository.Save();
+                    TempData["success"] = "Grant admin role successfully!";
                     return RedirectToAction("List");
                 }
-                user.Roles.Add(adminRole);
-                _db.SaveChanges();
-                TempData["success"] = "Grant admin role successfully!";
-                return RedirectToAction("List");
             }
             TempData["error"] = "User not found!";
             return RedirectToAction("List");
@@ -256,7 +250,7 @@ namespace BookStore.Controllers
             var user = await _accountrepository.getByEmailAsync(passwordReset.Email);
             if (user != null)
             {
-                await _accountrepository.resetPassword(user, newpassword);
+                _accountrepository.resetPassword(user, newpassword);
                 _accountrepository.removePasswordReset(passwordReset);  
                 _accountrepository.Save();
                 TempData["success"] = "Password changed successfully!";

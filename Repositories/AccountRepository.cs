@@ -58,17 +58,22 @@ namespace BookStore.Repositories
             return account;
         }
 
-        public void GrantAdmin(int userID)
+        public void GrantAdmin(Account user, out string errorMessage)
         {
-            throw new NotImplementedException();
+            errorMessage = null;
+            var adminRole = _db.Roles.Find(1);
+            if (adminRole == null)
+            {
+                errorMessage = "Admin role not found!";
+            }
+            if (user.Roles.Any(r => r.RoleId == 1 || r.RoleName == "Admin"))
+            {
+                errorMessage = "User already has admin role!";
+            }
+            user.Roles.Add(adminRole);
         }
 
         public Task<Account> Login(string username, string password)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Register(Account user)
         {
             throw new NotImplementedException();
         }
@@ -97,11 +102,11 @@ namespace BookStore.Repositories
             _db.PasswordReset.Remove(passwordReset);
         }
 
-        public async Task resetPassword(Account user, string newpassword)
+        public void resetPassword(Account user, string newpassword)
         {
             if(user!=null)
             {
-                user.Password = await _passwordHasher.HashPassword(user, newpassword);
+                user.Password = _passwordHasher.HashPassword(user, newpassword);
                 _db.Accounts.Update(user);
             }
             
@@ -118,6 +123,18 @@ namespace BookStore.Repositories
             if (account == null)
                 return null;
             return account;
+        }
+
+        public PasswordVerificationResult passwordVerificationResult(Account user, string userPassword, string inputPassword)
+        {
+            return _passwordHasher.VerifyHashedPassword(user, user.Password, inputPassword);
+        }
+
+        public void createNewUser(Account user)
+        {
+            user.Password = _passwordHasher.HashPassword(user, user.Password);
+            user.Roles.Add(_db.Roles.Find(2));
+            _db.Accounts.Add(user);
         }
     }
 }

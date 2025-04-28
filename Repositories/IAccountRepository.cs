@@ -1,4 +1,5 @@
 ﻿using BookStore.DataModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookStore.Repositories
 {
@@ -8,9 +9,9 @@ namespace BookStore.Repositories
 
         Task<Account> Login(string username, string password);
 
-        void Register(Account user);
+        void createNewUser(Account user);
 
-        void GrantAdmin(int userID);
+        void GrantAdmin(Account user, out string errorMessage);
 
         bool Remove(int? userID);
 
@@ -29,7 +30,9 @@ namespace BookStore.Repositories
         void removePasswordReset(PasswordReset passwordReset);
 
         void Save();
-        Task resetPassword(Account user, string newpassword);
+        void resetPassword(Account user, string newpassword);
+
+        PasswordVerificationResult passwordVerificationResult(Account user, string userPassword, string inputPassword);
 
     }
 }
