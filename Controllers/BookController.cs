@@ -1,5 +1,6 @@
 ﻿using BookStore.Data;
 using BookStore.DataModels;
+using BookStore.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,10 +10,10 @@ namespace BookStore.Controllers
 {
     public class BookController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public BookController(ApplicationDbContext db)
+        private readonly IBookRepository _bookRepository;
+        public BookController(IBookRepository bookRepository)
         {
-            _db = db;   
+            _bookRepository = bookRepository;
         }
 
         //Add function
@@ -20,7 +21,8 @@ namespace BookStore.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Add()
         {
-            ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "Name");
+            var categories = _bookRepository.GetAllCategories();
+            ViewBag.Categories = new SelectList(categories, "CategoryId", "Name");
             return View();
         }
 
@@ -31,16 +33,14 @@ namespace BookStore.Controllers
         {
             if (ModelState.IsValid)
             {
-                book.Categories = _db.Categories.Where(c => book.SelectedCategories.Contains(c.CategoryId)).ToList();
-
-                _db.Books.Add(book);
-                _db.SaveChanges();
+                _bookRepository.AddnewBook(book);
+                _bookRepository.Save();
 
                 TempData["success"] = "Book added successfully!";
                 return RedirectToAction("List");
             }
-
-            ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "Name");
+            var categories = _bookRepository.GetAllCategories();
+            ViewBag.Categories = new SelectList(categories, "CategoryId", "Name");
             TempData["error"] = "Failed to add book!";
             return View(book);
         }
@@ -58,9 +58,7 @@ namespace BookStore.Controllers
                 TempData["error"] = "Book not found!";
                 return RedirectToAction("List");
             }
-            var book = _db.Books.Include(ct => ct.Categories)
-                //.Include(wh=>wh.Warehouse)
-                .FirstOrDefault(y=>y.BookId == id);
+            var book = _bookRepository.findById(id);
 
             return View(book);
         }
@@ -72,8 +70,8 @@ namespace BookStore.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Books.Update(book);
-                _db.SaveChanges();
+                _bookRepository.EditBook(book);
+                _bookRepository.Save();
                 TempData["success"] = "Book updated successfully!";
                 return RedirectToAction("List");
             }
@@ -85,7 +83,7 @@ namespace BookStore.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult List()
         {
-            var books = _db.Books.Include(ct=>ct.Categories).ToList();
+            var books = _bookRepository.getAll();
             return View(books);
         }
 
@@ -96,7 +94,7 @@ namespace BookStore.Controllers
         {
             if (id != null)
             {
-                var detailBook = _db.Books.Find(id);
+                var detailBook = _bookRepository.findById(id);
                 return View(detailBook);
             }
             TempData["error"] = "Book not found!";
@@ -114,9 +112,9 @@ namespace BookStore.Controllers
                 TempData["error"] = "Book not found!";
                 return RedirectToAction("List");
             }
-            var book = _db.Books.FirstOrDefault(y => y.BookId == id);
-            _db.Books.Remove(book);
-            _db.SaveChanges();
+            var book = _bookRepository.findById(id);
+            _bookRepository.RemoveBook(book);
+            _bookRepository.Save();
             TempData["success"] = "Book deleted successfully!";
             return RedirectToAction("List");
         }

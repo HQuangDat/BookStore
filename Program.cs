@@ -21,6 +21,7 @@ namespace BookStore
 
             builder.Services.AddScoped < IPasswordHasher<Account>, PasswordHasher<Account>>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<IBookRepository, BookRepository>();
 
             builder.Services.AddAuthentication(options =>
             {
