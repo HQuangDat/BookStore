@@ -13,18 +13,17 @@ using Microsoft.AspNetCore.Authentication.Google;
 using System.Net.Mail;
 using System.Net;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
+using BookStore.Repositories;
 
 
 namespace BookStore.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        private readonly IPasswordHasher<Account> _passwordHasher;
-        public AccountController(ApplicationDbContext db, IPasswordHasher<Account> passwordHasher)
+        private readonly IAccountRepository _accountrepository;
+        public AccountController(IAccountRepository accountrepository)
         {
-            _db = db;
-            _passwordHasher = passwordHasher;
+            _accountrepository = accountrepository;
         }
 
         //For Login
@@ -170,11 +169,10 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int? id)
         {
-            Account user = _db.Accounts.FirstOrDefault(us => us.AccountId == id);
-            if (user != null)
+            bool isDeleted = _accountrepository.Remove(id);
+            if (isDeleted)
             {
-                _db.Accounts.Remove(user);
-                _db.SaveChanges();
+                _accountrepository.Save();
                 TempData["success"] = "Delete successfully!";
                 return RedirectToAction("List");
             }
@@ -187,7 +185,7 @@ namespace BookStore.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult List()
         {
-            var listAccount = _db.Accounts.ToList();
+            var listAccount = _accountrepository.GetAllAccounts();
             return View(listAccount);
         }
 
@@ -196,8 +194,8 @@ namespace BookStore.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Details(int id)
         {
-            var user = _db.Accounts.Include(rol=>rol.Roles).FirstOrDefault(u => u.AccountId == id);
-            if(user == null)
+            var user = _accountrepository.Details(id);
+            if (user == null)
             {
                 TempData["error"] = "User not found!";
                 return RedirectToAction("List");
@@ -216,21 +214,16 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
         {
-            var user = await _db.Accounts.FirstOrDefaultAsync(u => u.Email == email);
-            if(user == null)
+            var user = _accountrepository.getByEmailAsync(email);
+            if (user == null)
             {
                 TempData["error"] = "Email not found!";
                 return View();
             }
             // Generate a password reset token
             string token = Guid.NewGuid().ToString();
-            _db.PasswordReset.Add(new PasswordReset
-            {
-                Email = email,
-                Token = token,
-                ExpireDate = DateTime.UtcNow.AddHours(1)
-            });
-            _db.SaveChanges();
+            _accountrepository.createPasswordReset(email, token);
+            _accountrepository.Save();
 
             // Send email 
             var resetLink = Url.Action("ResetPassword", "Account", new { token = token }, Request.Scheme);
@@ -242,8 +235,8 @@ namespace BookStore.Controllers
         [HttpGet]
         public IActionResult ResetPassword(string token)
         {
-            var passwordReset = _db.PasswordReset.FirstOrDefault(p => p.Token == token);
-            if(passwordReset == null || passwordReset.ExpireDate < DateTime.UtcNow)
+            var passwordReset = _accountrepository.getPasswordReset(token);
+            if (passwordReset == null || passwordReset.ExpireDate < DateTime.UtcNow)
             {
                 TempData["error"] = "Invalid or expired token!";
                 return Content("Invalid or expired token!");
@@ -254,18 +247,18 @@ namespace BookStore.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(string token, string newpassword)
         {
-            var passwordReset = _db.PasswordReset.FirstOrDefault(p => p.Token == token);
+            var passwordReset = _accountrepository.getPasswordReset(token);
             if (passwordReset == null || passwordReset.ExpireDate < DateTime.UtcNow)
             {
                 TempData["error"] = "Invalid or expired token!";
                 return Content("Invalid or expired token!");
             }
-            var user = await _db.Accounts.FirstOrDefaultAsync(u => u.Email == passwordReset.Email);
-            if(user != null)
+            var user = await _accountrepository.getByEmailAsync(passwordReset.Email);
+            if (user != null)
             {
-                user.Password = _passwordHasher.HashPassword(user, newpassword);
-                _db.PasswordReset.Remove(passwordReset);
-                _db.SaveChanges();
+                await _accountrepository.resetPassword(user, newpassword);
+                _accountrepository.removePasswordReset(passwordReset);  
+                _accountrepository.Save();
                 TempData["success"] = "Password changed successfully!";
                 return RedirectToAction("Login");
             }
