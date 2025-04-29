@@ -1,5 +1,6 @@
 ﻿using BookStore.Data;
 using BookStore.DataModels;
+using BookStore.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,10 @@ namespace BookStore.Controllers
     [Authorize]
     public class CartController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CartController(ApplicationDbContext db)
+        private readonly ICartRepository _cartrepo;
+        public CartController(ICartRepository cartrepo)
         {
-            _db = db;
+            _cartrepo = cartrepo;
         }
 
         //Add item to Cart
@@ -29,7 +30,7 @@ namespace BookStore.Controllers
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var cartBook = _db.Books.Find(id);
+            var cartBook =_cartrepo.findBookbyID(id);
 
             if (userId == null || cartBook == null)
             {
@@ -38,12 +39,12 @@ namespace BookStore.Controllers
             }
 
             int accountId = int.Parse(userId);
-            var existingCartItem = _db.Carts.FirstOrDefault(c => c.AccountId == accountId && c.BookId == id);
+            var existingCartItem = _cartrepo.existingCartItem(accountId, id);
 
             if (existingCartItem != null)
             {
                 existingCartItem.Quantity += 1;
-                _db.Carts.Update(existingCartItem);
+                _cartrepo.Update(existingCartItem);
             }
             else
             {
@@ -53,10 +54,10 @@ namespace BookStore.Controllers
                     AccountId = accountId,
                     BookId = id.Value
                 };
-                _db.Carts.Add(cart);
+                _cartrepo.Add(cart);
             }
 
-            _db.SaveChanges();
+            _cartrepo.Save();
             TempData["success"] = "Added to cart successfully";
 
             return RedirectToAction("Index");
@@ -67,7 +68,7 @@ namespace BookStore.Controllers
         public IActionResult Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var listCart = _db.Carts.Include(bk=>bk.Book).Where(id=> id.AccountId.ToString() == userId).ToList();
+            var listCart = _cartrepo.getAllByUserID(userId);
             return View(listCart);
         }
 
@@ -77,9 +78,9 @@ namespace BookStore.Controllers
         {
             if(id != null)
             {
-                Cart cart = _db.Carts.FirstOrDefault(bk=>bk.BookId == id);
-                _db.Carts.Remove(cart);
-                _db.SaveChanges();
+                Cart cart = _cartrepo.findCartbyBookID(id);
+                _cartrepo.Remove(cart);
+                _cartrepo.Save();
                 TempData["success"] = "Success";
                 return RedirectToAction("Index");
             }
