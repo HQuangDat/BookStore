@@ -118,5 +118,14 @@ namespace BookStore.Controllers
             TempData["success"] = "Book deleted successfully!";
             return RedirectToAction("List");
         }
+
+        //Fetch book for Search function 
+        [HttpGet]
+        public JsonResult fetchBookTitle()
+        {
+            var bookTitle = _bookRepository.getAll().Select(b => b.BookName).ToList();
+
+            return Json(bookTitle);
+        }
     }
 }

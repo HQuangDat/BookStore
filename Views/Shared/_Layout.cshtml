@@ -57,13 +57,15 @@
                     </ul>
 
                     @* Search *@
-                    <div class="d-flex justify-content-center flex-grow-1">
-                        <form class="d-flex w-50">
-                            <input class="form-control me-2" type="search" placeholder="Search">
+                    <div class="d-flex justify-content-center flex-grow-1 position-relative">
+                        <form class="d-flex w-50 position-relative">
+                            <input id="searchInput" class="form-control me-2" type="search" placeholder="Search" autocomplete="off">
                             <button class="btn btn-secondary" type="submit">Search</button>
                         </form>
+                        <ul id="searchResult" class="list-group position-absolute w-50" style="top: 100%; z-index: 1000;"></ul>
                     </div>
 
+                    
                     @* Cart *@
                     <a asp-controller="Cart" asp-action="Index" class="position-relative text-decoration-none">
                         <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
@@ -89,6 +91,7 @@
     <script src="~/js/jquery-3.7.1.min.js"></script>
     <script src="~/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/SearchItem.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
