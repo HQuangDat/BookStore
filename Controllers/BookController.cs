@@ -123,9 +123,13 @@ namespace BookStore.Controllers
         [HttpGet]
         public JsonResult fetchBookTitle()
         {
-            var bookTitle = _bookRepository.getAll().Select(b => b.BookName).ToList();
+            var books = _bookRepository.getAll()   
+                                                .Select(b => new {
+                                                    BookId = b.BookId, 
+                                                    BookName = b.BookName,
+                                                    ImagePath = b.ImagePath}).ToList();
 
-            return Json(bookTitle);
+            return Json(books);
         }
     }
 }
