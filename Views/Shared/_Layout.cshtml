@@ -94,12 +94,18 @@
                     </div>
 
                     
-                    @* Cart *@
+                    @* Cart Icon *@
                     <a asp-controller="Cart" asp-action="Index" class="position-relative text-decoration-none">
                         <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
                             <img src="~/lib/bootstrap-icons/icons/cart.svg" alt="Cart" width="24" height="24">
+
+                            <span id="countDisplay"
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 0.75rem; display: none;">
+                            </span>
                         </div>
                     </a>
+
                 </div>
             </div>
         </nav>
@@ -120,6 +126,7 @@
     <script src="~/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/SearchItem.js"></script>
+    <script src="~/js/cartItemCount.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

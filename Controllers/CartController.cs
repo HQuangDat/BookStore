@@ -87,5 +87,16 @@ namespace BookStore.Controllers
             TempData["error"] = "Remove item failed";
             return RedirectToAction("Index");
         }
+
+        //Get number of items in cart and then turn it into JSON
+        [HttpGet]
+        [Authorize]
+        public JsonResult GetCartCount()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var listCart = _cartrepo.getAllByUserID(userId);
+            int count = listCart.Count();
+            return Json(count);
+        }
     }
 }
