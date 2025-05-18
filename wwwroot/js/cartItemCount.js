@@ -16,7 +16,6 @@
                 }
             })
             .catch(() => {
-                // User is not logged in or error occurred
                 countDisplay.style.display = "none";
             });
     }

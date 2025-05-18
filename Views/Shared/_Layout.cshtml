@@ -36,6 +36,15 @@
         #searchResult img {
             border-radius: 5px;
         }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+
+        .dropdown-menu {
+            transition: all 0.3s ease;
+        }
     </style>
 
 </head>
@@ -55,6 +64,17 @@
                                 <span class="visually-hidden">(current)</span>
                             </a>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="categoryDropdownToggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Category
+                            </a>
+                            <ul id="categoryDropdown" class="dropdown-menu" aria-labelledby="categoryDropdownToggle">
+                                <!-- Dynamically populated -->
+                            </ul>
+                        </li>
+
+
 
                         @if(User.Identity.IsAuthenticated)
                         {
@@ -127,6 +147,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/SearchItem.js"></script>
     <script src="~/js/cartItemCount.js"></script>
+    <script src="~/js/CategoryDropdown.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

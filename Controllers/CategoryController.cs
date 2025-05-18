@@ -89,5 +89,16 @@ namespace BookStore.Controllers
             TempData["success"] = "Category deleted successfully!";
             return RedirectToAction("List");
         }
+
+        [HttpGet]
+        public JsonResult getAllCategoryName()
+        {
+            var name = _categoryRepository.GetAll().Select(b => new
+            {
+               categoryId = b.CategoryId,
+               categoryName = b.Name
+            }).ToList();
+            return Json(name);
+        }
     }
 }

@@ -1,9 +1,9 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", () =>  {
     const searchInput = document.getElementById("searchInput");
     const searchResult = document.getElementById("searchResult");
 
     if (!searchInput || !searchResult) return;
-
+    
     let books = [];
 
     fetch('/Book/fetchBookTitle')
