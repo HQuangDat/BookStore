@@ -9,7 +9,7 @@
                 const a = document.createElement("a");
                 li.classList.add("list-group-item", "p-0");
                 a.classList.add("dropdown-item");
-                a.href = `/Category/${category.categoryId}`;
+                a.href = `/Book/FindByCategory/${category.categoryId}`;
                 a.textContent = category.categoryName;
                 li.appendChild(a);
                 dropdownMenu.appendChild(li); 

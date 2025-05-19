@@ -131,5 +131,15 @@ namespace BookStore.Controllers
 
             return Json(books);
         }
+
+        [HttpGet]
+        public IActionResult FindByCategory(int id)
+        {
+            var books = _bookRepository.getAll()
+                .Where(b => b.Categories.Any(c => c.CategoryId == id))
+                .ToList();
+
+            return View(books);
+        }
     }
 }
