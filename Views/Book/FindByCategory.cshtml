@@ -5,8 +5,6 @@
 }
 
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Books by Category</h2>
-
     @if (!Model.Any())
     {
         <div class="alert alert-info text-center">
@@ -20,14 +18,16 @@
             {
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0">
-                        <img src="@item.ImagePath" class="card-img-top" alt="@item.BookName" style="height: 250px; object-fit: cover;" onerror="this.src='/images/default-book.png'">
+                        <a class="text-decoration-none text-dark" href="/Book/Details/@item.BookId">
+                            <img src="@item.ImagePath" class="card-img-top" alt="@item.BookName" style="height: 250px; object-fit: cover;" onerror="this.src='/images/default-book.png'">
 
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">@item.BookName</h5>
-                            <p class="card-text mb-1"><strong>Author:</strong> @item.Author</p>
-                            <p class="card-text mb-1"><strong>Provider:</strong> @item.Provider</p>
-                            <p class="card-text text-primary fw-bold mt-auto">$@item.Price.ToString("0.00")</p>
-                        </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">@item.BookName</h5>
+                                <p class="card-text mb-1"><strong>Author:</strong> @item.Author</p>
+                                <p class="card-text mb-1"><strong>Provider:</strong> @item.Provider</p>
+                                <p class="card-text text-primary fw-bold mt-auto">$@item.Price.ToString("0.00")</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
             }
