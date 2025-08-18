@@ -13,6 +13,5 @@ namespace BookStore.Repositories
         Book findById(int? id);
 
         IEnumerable<Category> GetAllCategories();
-        void Save();
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Controllers
 {
-    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;
@@ -17,6 +16,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add()
         {
             return View();
@@ -24,6 +24,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add(Category category)
         {
             if (ModelState.IsValid)
@@ -39,6 +40,7 @@ namespace BookStore.Controllers
 
         //Edit method
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -54,6 +56,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(Category category)
         {
             if (ModelState.IsValid)
@@ -67,6 +70,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult List()
         {
             var categories = _categoryRepository.GetAll();
@@ -76,6 +80,7 @@ namespace BookStore.Controllers
         //Delete method
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int? id)
         {
             if (id == null)

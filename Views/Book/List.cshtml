@@ -25,11 +25,11 @@
                 <table class="table table-hover table-striped table-bordered align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>Book Name</th>
-                            <th>Provider</th>
-                            <th>Price</th>
+                            <th><a asp-action="List" asp-route-sortOrder="@ViewData["SortByNameParam"]">Book name</a></th>
+                            <th><a asp-action="List" asp-route-sortOrder="@ViewData["SortByProviderParam"]">Provider</a></th>
+                            <th><a asp-action="List" asp-route-sortOrder="@ViewData["SortByPriceParam"]">Price</a></th>
                             <th>Image</th>
-                            <th>Author</th>
+                            <th><a asp-action="List" asp-route-sortOrder="@ViewData["SortByAuthorParam"]">Author</a></th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>

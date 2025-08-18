@@ -14,6 +14,7 @@ using System.Net.Mail;
 using System.Net;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using BookStore.Repositories;
+using Serilog;
 
 
 namespace BookStore.Controllers
@@ -61,37 +62,47 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string username, string password)
         {
-            var existUser = await _accountrepository.getByUsernameAsync(username);
-            if (existUser != null)
+            try
             {
-                PasswordVerificationResult result = _accountrepository.passwordVerificationResult(existUser, existUser.Password, password);
-                if (result == PasswordVerificationResult.Success)
+                var existUser = await _accountrepository.getByUsernameAsync(username);
+                if (existUser != null)
                 {
-                    var claims = new List<Claim>
+                    PasswordVerificationResult result = _accountrepository.passwordVerificationResult(existUser, existUser.Password, password);
+                    if (result == PasswordVerificationResult.Success)
+                    {
+                        var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, existUser.Email),
                         new Claim(ClaimTypes.Role, existUser.Roles.FirstOrDefault().RoleName),
                         new Claim(ClaimTypes.NameIdentifier, existUser.AccountId.ToString())
                     };
 
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var authProperties = new AuthenticationProperties
-                    {
-                        IsPersistent = true,
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-                    };
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProperties = new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                        };
 
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity),
-                        authProperties);
+                        await HttpContext.SignInAsync(
+                            CookieAuthenticationDefaults.AuthenticationScheme,
+                            new ClaimsPrincipal(claimsIdentity),
+                            authProperties);
 
-                    TempData["success"] = "Login successful";
-                    return RedirectToAction("Index", "Home");
+                        TempData["success"] = "Login successful";
+                        Log.Information("User {Username} logged in successfully", username);
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
+                TempData["error"] = "An error occurred while processing your request. Please try again later.";
+                Log.Error("An error occurred during login for user");
+                return View();
             }
-            TempData["error"] = "Invalid username or password!";
-            return View();
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred during login for user {Username}", username);
+                return View();
+            }
         }
 
         //For Register
@@ -230,11 +241,18 @@ namespace BookStore.Controllers
         public IActionResult ResetPassword(string token)
         {
             var passwordReset = _accountrepository.getPasswordReset(token);
-            if (passwordReset == null || passwordReset.ExpireDate < DateTime.UtcNow)
+            if (passwordReset == null)
             {
                 TempData["error"] = "Invalid or expired token!";
-                return Content("Invalid or expired token!");
+                return Content("Invalid token!");
             }
+            else if (passwordReset.ExpireDate < DateTime.UtcNow)
+            {
+                _accountrepository.removePasswordReset(passwordReset);
+                _accountrepository.Save();
+                TempData["error"] = "Expired token!";
+                return Content("Expired token!");
+            }   
             return View(model:token);
         }
 
@@ -242,11 +260,6 @@ namespace BookStore.Controllers
         public async Task<IActionResult> ResetPassword(string token, string newpassword)
         {
             var passwordReset = _accountrepository.getPasswordReset(token);
-            if (passwordReset == null || passwordReset.ExpireDate < DateTime.UtcNow)
-            {
-                TempData["error"] = "Invalid or expired token!";
-                return Content("Invalid or expired token!");
-            }
             var user = await _accountrepository.getByEmailAsync(passwordReset.Email);
             if (user != null)
             {

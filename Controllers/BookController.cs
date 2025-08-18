@@ -34,8 +34,6 @@ namespace BookStore.Controllers
             if (ModelState.IsValid)
             {
                 _bookRepository.AddnewBook(book);
-                _bookRepository.Save();
-
                 TempData["success"] = "Book added successfully!";
                 return RedirectToAction("List");
             }
@@ -71,7 +69,6 @@ namespace BookStore.Controllers
             if (ModelState.IsValid)
             {
                 _bookRepository.EditBook(book);
-                _bookRepository.Save();
                 TempData["success"] = "Book updated successfully!";
                 return RedirectToAction("List");
             }
@@ -81,15 +78,45 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult List()
+        public IActionResult List(string sortOrder)
         {
+            ViewData["SortByNameParam"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
+            ViewData["SortByAuthorParam"] = sortOrder == "Author" ? "Author_desc" : "Author";
+            ViewData["SortByPriceParam"] = sortOrder == "Price" ? "Price_desc" : "Price";
+            ViewData["SortByProviderParam"] = sortOrder == "Provider" ? "Provider_desc" : "Provider";
             var books = _bookRepository.getAll();
+            switch (sortOrder)
+            {
+                case "Name_desc":
+                    books = books.OrderByDescending(b => b.BookName);
+                    break;
+                case "Author":
+                    books = books.OrderBy(b => b.Author);
+                    break;
+                case "Author_desc":
+                    books = books.OrderByDescending(b => b.Author);
+                    break;
+                case "Price":
+                    books = books.OrderBy(b => b.Price);
+                    break;
+                case "Price_desc":
+                    books = books.OrderByDescending(b => b.Price);
+                    break;
+                case "Provider":
+                    books = books.OrderBy(b => b.Provider);
+                    break;
+                case "Provider_desc":
+                    books = books.OrderByDescending(b => b.Provider);
+                    break;
+                default:
+                    books = books.OrderBy(b => b.BookName);
+                    break;
+            }
             return View(books);
         }
 
         //For Book details
         [HttpGet]
-        [Authorize]
         public IActionResult Details(int? id)
         {
             if (id != null)
