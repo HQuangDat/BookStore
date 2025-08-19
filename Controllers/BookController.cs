@@ -78,8 +78,9 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult List(string sortOrder)
+        public IActionResult List(string sortOrder, int? pageNumber)
         {
+            ViewData["CurrentSort"] = sortOrder;
             ViewData["SortByNameParam"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
             ViewData["SortByAuthorParam"] = sortOrder == "Author" ? "Author_desc" : "Author";
             ViewData["SortByPriceParam"] = sortOrder == "Price" ? "Price_desc" : "Price";
@@ -112,7 +113,8 @@ namespace BookStore.Controllers
                     books = books.OrderBy(b => b.BookName);
                     break;
             }
-            return View(books);
+            int pageSize = 5; 
+            return View(PaginatedList<Book>.Create(books, pageNumber ?? 1, pageSize));
         }
 
         //For Book details
@@ -141,7 +143,6 @@ namespace BookStore.Controllers
             }
             var book = _bookRepository.findById(id);
             _bookRepository.RemoveBook(book);
-            _bookRepository.Save();
             TempData["success"] = "Book deleted successfully!";
             return RedirectToAction("List");
         }
