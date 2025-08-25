@@ -5,15 +5,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Serilog;
+using System.Diagnostics;
 
 namespace BookStore.Controllers
 {
     public class BookController : Controller
     {
         private readonly IBookRepository _bookRepository;
-        public BookController(IBookRepository bookRepository)
+        private readonly IMemoryCache _memoryCache;
+        public BookController(IBookRepository bookRepository, IMemoryCache memoryCache)
         {
             _bookRepository = bookRepository;
+            _memoryCache = memoryCache;
         }
 
         //Add function
@@ -80,41 +85,68 @@ namespace BookStore.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult List(string sortOrder, int? pageNumber)
         {
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["SortByNameParam"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
-            ViewData["SortByAuthorParam"] = sortOrder == "Author" ? "Author_desc" : "Author";
-            ViewData["SortByPriceParam"] = sortOrder == "Price" ? "Price_desc" : "Price";
-            ViewData["SortByProviderParam"] = sortOrder == "Provider" ? "Provider_desc" : "Provider";
-            var books = _bookRepository.getAll();
-            switch (sortOrder)
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            try
             {
-                case "Name_desc":
-                    books = books.OrderByDescending(b => b.BookName);
-                    break;
-                case "Author":
-                    books = books.OrderBy(b => b.Author);
-                    break;
-                case "Author_desc":
-                    books = books.OrderByDescending(b => b.Author);
-                    break;
-                case "Price":
-                    books = books.OrderBy(b => b.Price);
-                    break;
-                case "Price_desc":
-                    books = books.OrderByDescending(b => b.Price);
-                    break;
-                case "Provider":
-                    books = books.OrderBy(b => b.Provider);
-                    break;
-                case "Provider_desc":
-                    books = books.OrderByDescending(b => b.Provider);
-                    break;
-                default:
-                    books = books.OrderBy(b => b.BookName);
-                    break;
+                var cacheKey = $"books_all";
+                List<Book> books;
+                ViewData["CurrentSort"] = sortOrder;
+                ViewData["SortByNameParam"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
+                ViewData["SortByAuthorParam"] = sortOrder == "Author" ? "Author_desc" : "Author";
+                ViewData["SortByPriceParam"] = sortOrder == "Price" ? "Price_desc" : "Price";
+                ViewData["SortByProviderParam"] = sortOrder == "Provider" ? "Provider_desc" : "Provider";
+
+                if (_memoryCache.TryGetValue(cacheKey, out List<Book> cachedbooks))
+                {
+                    Log.Information("Found books and fetched them from cache");
+                    books = cachedbooks;
+                }
+                else
+                {
+                    Log.Information("Did not find books in cache. Fetching from database.");
+                    books = _bookRepository.getAll().ToList();
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(1))
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(10))
+                        .SetPriority(CacheItemPriority.Normal);
+                    _memoryCache.Set(cacheKey, books, cacheEntryOptions);
+                }
+                switch (sortOrder)
+                {
+                    case "Name_desc":
+                        books = books.OrderByDescending(b => b.BookName).ToList();
+                        break;
+                    case "Author":
+                        books = books.OrderBy(b => b.Author).ToList();
+                        break;
+                    case "Author_desc":
+                        books = books.OrderByDescending(b => b.Author).ToList();
+                        break;
+                    case "Price":
+                        books = books.OrderBy(b => b.Price).ToList();
+                        break;
+                    case "Price_desc":
+                        books = books.OrderByDescending(b => b.Price).ToList();
+                        break;
+                    case "Provider":
+                        books = books.OrderBy(b => b.Provider).ToList();
+                        break;
+                    case "Provider_desc":
+                        books = books.OrderByDescending(b => b.Provider).ToList();
+                        break;
+                    default:
+                        books = books.OrderBy(b => b.BookName).ToList();
+                        break;
+                }
+                int pageSize = 5;
+                return View(PaginatedList<Book>.Create(books, pageNumber ?? 1, pageSize));
             }
-            int pageSize = 5; 
-            return View(PaginatedList<Book>.Create(books, pageNumber ?? 1, pageSize));
+            finally
+            {
+                stopWatch.Stop();
+                Log.Information("Time taken to fetch books: {ElapsedMilliseconds} ms", stopWatch.ElapsedMilliseconds);
+            }
         }
 
         //For Book details
