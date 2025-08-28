@@ -1,143 +1,78 @@
 # BookStore 📚
 
-BookStore is an ASP.NET MVC web application designed for managing an online bookstore. It includes features for user authentication via username and password (with passwords securely hashed), authorization with Google OAuth2 for specific features, CRUD operations for book management, email notifications for order confirmations, and password reset functionality using SMTP. The application supports role-based access, allowing admins to manage books, accounts, warehouse inventory, and categories.
+BookStore is an ASP.NET Core Razor Pages web application for managing an online bookstore. It supports user authentication, Google OAuth2, book and category management, cart and warehouse features, password reset via email, and background job processing with Hangfire.
 
-## Features ✨
+## Features
 
-- **User Authentication** 🔒: Secure login using username and password, with passwords hashed using `PasswordHasher`.
-- **Google OAuth2 Authorization** 🔗: Authorizes users to access specific features without storing OAuth2 data in the database.
-- **CRUD Operations** 📝: Create, read, update, and delete books, accounts, and categories.
-- **Order Confirmation Emails** 📧: Sends emails to users upon checkout, including a list of purchased items via SMTP.
-- **Password Reset** 🔑: Allows users to reset passwords by receiving a token via email (SMTP).
-- **Role-Based Access** 👥:
-  - **Users**: Browse and purchase books, with access to additional features via OAuth2 authorization.
-  - **Admins**: Manage books, user accounts, warehouse inventory, and book categories.
-- **Database** 💾: Uses a `bookStore` database for storing application data.
+- **User Authentication**: Secure login with username and password (hashed).
+- **Google OAuth2**: Login and access with Google accounts.
+- **Role-Based Authorization**: Admin, User, and Saler roles for access control.
+- **Book Management**: CRUD operations for books and categories.
+- **Cart**: Add, update, and remove books from user cart.
+- **Warehouse**: Manage book inventory and quantities across warehouses.
+- **Password Reset**: Users can reset passwords via email with secure tokens.
+- **Email Notifications**: Password reset and order confirmation emails sent via SMTP.
+- **Background Jobs**: Email sending handled asynchronously using Hangfire.
+- **Logging**: Application events logged with Serilog.
 
-## Prerequisites 🛠️
+## Getting Started
 
-To run the BookStore project locally, ensure you have the following installed:
+### Prerequisites
 
-- **Visual Studio 2022** (with ASP.NET and web development workload)
-- **.NET Framework** (version compatible with the project, typically .NET 4.x or .NET Core depending on the setup)
-- **SQL Server** (for the `bookStore` database)
-- **Google OAuth2 Credentials** (Client ID and Secret for authorization)
-- **SMTP Server Credentials** (e.g., Gmail SMTP, configured in the `SendEmail` functions)
-- A `bookStore` database set up in SQL Server (see Database Setup below)
+- .NET 8 SDK
+- Visual Studio 2022 or later
+- SQL Server (for the `bookStore` database)
+- Google OAuth2 credentials (Client ID/Secret)
+- SMTP credentials (e.g., Gmail App Password)
 
-## Getting Started 🚀
+### Setup
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/HQuangDat/BookStore.git
-cd BookStore
-```
-
-### 2. Database Setup 🗄️
-
-1. **Create the Database**:
-
-   - Open SQL Server Management Studio (SSMS) or your preferred SQL client.
-
-   - Create a new database named `bookStore`.
-
-   - Update the connection string in `Web.config` or `appsettings.json` to point to your SQL Server instance. Example:
-
-     ```xml
-     <connectionStrings>
-       <add name="DefaultConnection" connectionString="Server=your_server_name;Database=bookStore;Trusted_Connection=True;" providerName="System.Data.SqlClient" />
-     </connectionStrings>
-     ```
-
-2. **Run Migrations** (if using Entity Framework):
-
-   - Open the Package Manager Console in Visual Studio.
-
-   - Run the following commands:
-
-     ```bash
-     Update-Database
-     ```
-
-   Alternatively, if the database schema is provided as a `.sql` file in the repository, execute it to set up the tables.
-
-### 3. Configure Google OAuth2 🔗
-
-1. Go to the Google Cloud Console.
-
-2. Create a new project and enable the **Google+ API** (or equivalent for OAuth2).
-
-3. Create OAuth 2.0 credentials (Client ID and Client Secret).
-
-4. Add the credentials to your configuration file (`Web.config` or `appsettings.json`):
-
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/HQuangDat/BookStore.git
+   cd BookStore
    ```
-   "ConnectionStrings": {
-  "DefaultConnection": "Server=HQD;Database=BookStore;Trusted_Connection=true;TrustServerCertificate=true"
-    }
-   ```
+2. **Configure the database:**
+   - Create a SQL Server database named `bookStore`.
+   - Update the connection string in `appsettings.json` or user secrets.
+3. **Apply migrations:**
+   - Open the solution in Visual Studio.
+   - Run `Update-Database` in the Package Manager Console.
+4. **Configure Google OAuth2:**
+   - Add your Google Client ID and Secret to configuration.
+5. **Configure SMTP:**
+   - Update email and app password in `SendMailService.cs`.
+6. **Run the application:**
+   - Press F5 or run `dotnet run`.
 
-### 4. Configure SMTP for Email 📬
+### Hangfire Dashboard
 
-The SMTP configuration is handled within the `SendEmail` functions in the `Receipt` and `Account` controllers. Ensure you have valid SMTP credentials (e.g., Gmail SMTP with an App Password if 2-Step Verification is enabled). Update the credentials directly in the `SendEmail` functions as needed.
+Hangfire is used for background job processing (e.g., sending emails). You can add the Hangfire dashboard to your app for monitoring jobs.
 
-Example configuration in the `SendEmail` function (pseudo-code, adjust based on your implementation):
+## Project Structure
 
-```csharp
-var smtpClient = new SmtpClient("smtp.gmail.com")
-{
-    Port = 587,
-    Credentials = new NetworkCredential("your_email@gmail.com", "your_app_password"),
-    EnableSsl = true,
-};
-```
+- `Controllers/` - MVC controllers for books, accounts, cart, warehouse, etc.
+- `DataModels/` - Entity Framework Core models.
+- `Repositories/` - Data access and business logic.
+- `Service/` - Background services (e.g., email sending).
+- `Views/` - Razor views for UI.
+- `Program.cs` - App startup and configuration.
 
-### 5. Run the Application ▶️
+## Usage
 
-1. Open the solution (`BookStore.sln`) in **Visual Studio 2022**.
-2. Ensure the `bookStore` database is running and accessible.
-3. Press `F5` or click **Start** in Visual Studio to run the application.
-4. The application should launch in your default browser (e.g., `http://localhost:port`).
+- **Users**: Register, login, browse books, manage cart, checkout, reset password.
+- **Admins**: Manage books, categories, users, and warehouse inventory.
 
-## Project Structure 🏗️
+## Contributing
 
-- **Controllers/**: Contains MVC controllers, including `Receipt` and `Account` controllers with `SendEmail` functions for SMTP.
-- **Models/**: Defines data models and Entity Framework configurations.
-- **Views/**: Razor views for the user interface.
-- **App_Data/**: May contain database-related files (if applicable).
-- **appsetting.json**: Configuration file for database connections and Google OAuth2 settings.
+Pull requests are welcome! Please fork the repo and submit a PR.
 
-## Usage 🖱️
+## License
 
-- **Users**:
-  - Log in using username and password (securely hashed).
-  - Authorize with Google OAuth2 to access specific features.
-  - Browse books, add to cart, and checkout.
-  - Receive order confirmation emails with purchased items.
-  - Reset password via email if needed.
-- **Admins**:
-  - Log in with admin credentials.
-  - Manage books (add, edit, delete).
-  - Manage user accounts and categories.
-  - Monitor warehouse inventory.
+This project is for educational/demo purposes.
 
-## Contributing 🤝
+## Author
 
-Contributions are welcome! To contribute:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature`).
-3. Make your changes and commit (`git commit -m "Add your feature"`).
-4. Push to the branch (`git push origin feature/your-feature`).
-5. Open a Pull Request.
-
-## Contact 📩
-
-For questions or support, contact:
-
-- **Author**: Ho Quang Dat
-- **GitHub**: HQuangDat
-- **Email**: \hoquangdat123@gmail.com
-
----
+- **Ho Quang Dat**
+- GitHub: [HQuangDat](https://github.com/HQuangDat)
+- Email: hoquangdat123@gmail.com
