@@ -15,6 +15,8 @@ using System.Net;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using BookStore.Repositories;
 using Serilog;
+using Hangfire;
+using BookStore.Service;
 
 
 namespace BookStore.Controllers
@@ -232,8 +234,8 @@ namespace BookStore.Controllers
 
             // Send email 
             var resetLink = Url.Action("ResetPassword", "Account", new { token = token }, Request.Scheme);
-            await SendEmail(email, resetLink);
 
+            BackgroundJob.Enqueue<SendMailService>(mail => mail.SendEmail(email,resetLink));
             return RedirectToAction("Login");
         }
 
@@ -271,26 +273,25 @@ namespace BookStore.Controllers
             }
             TempData["error"] = "User not found!";
             return RedirectToAction("Login");
-            
         }
 
         //Send Email method
-        public async Task<IActionResult> SendEmail(string email, string resetLink)
-        {
-            var message = new MailMessage();
-            message.To.Add(new MailAddress(email));
-            message.Subject = "Reset your account password!";
-            message.Body = $"<p>Click <a href='{resetLink}'>here</a> to reset your password.</p>";
-            message.IsBodyHtml = true;
-            message.From = new MailAddress("hoquangdat123@gmail.com");
-            using (var smtp = new SmtpClient("smtp.gmail.com", 587))
-            {
-                smtp.Credentials = new NetworkCredential("hoquangdat123@gmail.com", "vpkp ssdb coam qfxp");
-                smtp.EnableSsl = true;
-                await smtp.SendMailAsync(message);
-            }
-            TempData["success"] = "Email sent successfully";
-            return Content("Email sent successfully!");
-        }
+        //public async Task<IActionResult> SendEmail(string email, string resetLink)
+        //{
+        //    var message = new MailMessage();
+        //    message.To.Add(new MailAddress(email));
+        //    message.Subject = "Reset your account password!";
+        //    message.Body = $"<p>Click <a href='{resetLink}'>here</a> to reset your password.</p>";
+        //    message.IsBodyHtml = true;
+        //    message.From = new MailAddress("hoquangdat123@gmail.com");
+        //    using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+        //    {
+        //        smtp.Credentials = new NetworkCredential("hoquangdat123@gmail.com", "vpkp ssdb coam qfxp");
+        //        smtp.EnableSsl = true;
+        //        await smtp.SendMailAsync(message);
+        //    }
+        //    TempData["success"] = "Email sent successfully";
+        //    return Content("Email sent successfully!");
+        //}
     }
 }
