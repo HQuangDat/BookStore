@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BookStore.Controllers
 {
@@ -12,9 +13,11 @@ namespace BookStore.Controllers
     public class WarehouseController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public WarehouseController(ApplicationDbContext db)
+        private readonly IMemoryCache _cache;
+        public WarehouseController(ApplicationDbContext db, IMemoryCache cache)
         {
             _db = db;
+            _cache = cache;
         }
 
         [HttpGet]
@@ -70,7 +73,14 @@ namespace BookStore.Controllers
         [HttpGet]
         public IActionResult List()
         {
-            var warehouses = _db.Warehouses.ToList();
+            const string cacheKey = "WarehouseList";
+            if (!_cache.TryGetValue(cacheKey, out List<Warehouse> warehouses))
+            {
+                warehouses = _db.Warehouses.ToList();
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                _cache.Set(cacheKey, warehouses, cacheEntryOptions);
+            }
             return View(warehouses);
         }
 
@@ -119,9 +129,16 @@ namespace BookStore.Controllers
         [HttpGet]
         public IActionResult ListQuantity()
         {
-            var warehouses = _db.BookWarehouses
-                .Include(bk=>bk.Book)
-                .Include(wh=>wh.Warehouse).ToList();
+            const string cacheKey = "WarehouseQuantityList";
+            if (!_cache.TryGetValue(cacheKey, out List<BookWarehouse> warehouses))
+            {
+                warehouses = _db.BookWarehouses
+                    .Include(bk=>bk.Book)
+                    .Include(wh=>wh.Warehouse).ToList();
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                _cache.Set(cacheKey, warehouses, cacheEntryOptions);
+            }
             return View(warehouses);
         }
 

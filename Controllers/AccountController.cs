@@ -17,6 +17,7 @@ using BookStore.Repositories;
 using Serilog;
 using Hangfire;
 using BookStore.Service;
+using Microsoft.Extensions.Caching.Memory;
 
 
 namespace BookStore.Controllers
@@ -24,9 +25,11 @@ namespace BookStore.Controllers
     public class AccountController : Controller
     {
         private readonly IAccountRepository _accountrepository;
-        public AccountController(IAccountRepository accountrepository)
+        private readonly IMemoryCache _cache;
+        public AccountController(IAccountRepository accountrepository, IMemoryCache cache)
         {
             _accountrepository = accountrepository;
+            _cache = cache;
         }
 
         //For Login
@@ -192,7 +195,14 @@ namespace BookStore.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult List()
         {
-            var listAccount = _accountrepository.GetAllAccounts();
+            const string cacheKey = "AccountList";
+            if (!_cache.TryGetValue(cacheKey, out List<Account> listAccount))
+            {
+                listAccount = _accountrepository.GetAllAccounts().ToList();
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                _cache.Set(cacheKey, listAccount, cacheEntryOptions);
+            }
             return View(listAccount);
         }
 
