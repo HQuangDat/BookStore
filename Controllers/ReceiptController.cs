@@ -28,21 +28,22 @@ namespace BookStore.Controllers
             var cartCheckout = _db.Carts
                 .Include(c => c.Book)
                 .Include(c => c.Account)
-                .Where(c => c.AccountId == int.Parse(userId))
+                .Where(c => c.AccountId == int.Parse(userId!))
                 .ToList();
             if (cartCheckout == null || !cartCheckout.Any())
             {
                 TempData["error"] = "Cart is empty!";
                 return RedirectToAction("Index", "Cart");
             }
-            ViewBag.Address = _db.Accounts.Find(int.Parse(userId)).Address;
-            ViewBag.Email = _db.Accounts.Find(int.Parse(userId)).Email;
+            var account = _db.Accounts.Find(int.Parse(userId!));
+            ViewBag.Address = account?.Address ?? "No address";
+            ViewBag.Email = account?.Email ?? "No Email";
             return View(cartCheckout);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmCheckout(List<Cart> CartItems)
+        public IActionResult ConfirmCheckout(List<Cart> CartItems)
         {
             if (CartItems == null || !CartItems.Any())
             {
@@ -50,7 +51,7 @@ namespace BookStore.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
-            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var checkOut = new Receipt
             {
@@ -77,10 +78,10 @@ namespace BookStore.Controllers
 
             //Send email to user
             var receipt = _db.Receipts.Include(r=>r.ReceiptItems).FirstOrDefault(rid=>rid.ReceiptId == checkOut.ReceiptId);
-            var userEmail = _db.Accounts.Find(userId).Email;
+            var userEmail = _db.Accounts.Find(userId)!.Email;
             if(userEmail != null)
             {
-                BackgroundJob.Enqueue<SendMailService>(mail => mail.SendConfirmOrderEmail(userEmail, receipt));
+                BackgroundJob.Enqueue<SendMailService>(mail => mail.SendConfirmOrderEmail(userEmail, receipt!));
                 TempData["success"] = "Email sent successfully!";
                 return RedirectToAction("Index", "Home");
             }

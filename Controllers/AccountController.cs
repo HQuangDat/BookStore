@@ -231,7 +231,7 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
         {
-            var user = _accountrepository.getByEmailAsync(email);
+            var user = await _accountrepository.getByEmailAsync(email);
             if (user == null)
             {
                 TempData["error"] = "Email not found!";

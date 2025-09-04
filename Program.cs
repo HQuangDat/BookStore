@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Google;
 using BookStore.Repositories;
 using Serilog;
+using Hangfire;
 
 namespace BookStore
 {
@@ -28,6 +29,10 @@ namespace BookStore
                 builder.Services.AddControllersWithViews();
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                builder.Services.AddHangfire((options) =>
+                    options.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"))
+                );
+                builder.Services.AddHangfireServer();
 
                 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
                 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
