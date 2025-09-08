@@ -1,59 +1,128 @@
-﻿@model IEnumerable<BookStore.DataModels.Book>
+@model IEnumerable<BookStore.DataModels.Book>
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="container mt-4">
-    <div class="container mt-4">
-        <div class="row">
-            @foreach (var item in Model)
-            {
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="@item.ImagePath" class="card-img-top" alt="Book Cover" style="height: 220px; object-fit: cover;">
-                        <div class="card-body d-flex flex-column text-center">
-                            <h6 class="card-title text-truncate">@item.BookName</h6>
-                            <p class="text-muted small mb-1">@item.Author</p>
-                            <p class="fw-bold text-danger">$@item.Price</p>
-                            <div class="mt-auto d-flex justify-content-center gap-2">
-                                <a asp-controller="Book" asp-action="Details" asp-route-id="@item.BookId" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-eye"></i> Details
-                                </a>
-                                <form asp-controller="Cart" asp-action="Add" asp-route-id="@item.BookId" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-outline-success btn-sm">
-                                        <i class="bi bi-cart"></i> Add
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
+<div class="container-fluid p-0">
+    <!-- Hero Section -->
+    <div class="hero-section text-center text-white py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Welcome to BookStore</h1>
+            <p class="lead">Your one-stop shop for all the books you love.</p>
+            <a asp-controller="Book" asp-action="List" class="btn btn-primary btn-lg">Explore Books</a>
         </div>
     </div>
 
-    <style>
-        .card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
+    <!-- New Arrivals Carousel -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">New Arrivals</h2>
+        <div id="newArrivalsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                @for (int i = 0; i < Model.Count(); i += 4)
+                {
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <div class="row">
+                            @foreach (var item in Model.Skip(i).Take(4))
+                            {
+                                <div class="col-md-3 mb-4">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <img src="@item.ImagePath" class="card-img-top" alt="Book Cover">
+                                        <div class="card-body d-flex flex-column text-center">
+                                            <h6 class="card-title text-truncate">@item.BookName</h6>
+                                            <p class="text-muted small mb-1">@item.Author</p>
+                                            <p class="fw-bold text-danger">$@item.Price</p>
+                                            <div class="mt-auto d-flex justify-content-center gap-2">
+                                                <a asp-controller="Book" asp-action="Details" asp-route-id="@item.BookId" class="btn btn-outline-primary btn-sm">
+                                                    <i class="bi bi-eye"></i> Details
+                                                </a>
+                                                <form asp-controller="Cart" asp-action="Add" asp-route-id="@item.BookId" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-outline-success btn-sm">
+                                                        <i class="bi bi-cart"></i> Add
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#newArrivalsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#newArrivalsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
 
-            .card:hover {
-                transform: scale(1.05);
-                box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-            }
-
-        .text-truncate {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        form {
-            display: inline-block; /* Ensures form aligns properly with the button */
-        }
-    </style>
-
+    <!-- Featured Categories -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Featured Categories</h2>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="category-card p-4">
+                    <i class="bi bi-book-half fs-1 text-primary"></i>
+                    <h4 class="mt-3">Fiction</h4>
+                    <p>Explore worlds of imagination and adventure.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-card p-4">
+                    <i class="bi bi-journal-bookmark-fill fs-1 text-success"></i>
+                    <h4 class="mt-3">Non-Fiction</h4>
+                    <p>Discover facts, history, and real-life stories.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-card p-4">
+                    <i class="bi bi-lightbulb-fill fs-1 text-warning"></i>
+                    <h4 class="mt-3">Science & Tech</h4>
+                    <p>Stay updated with the latest in science and technology.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<style>
+    .hero-section {
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+    }
+
+    .card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+    .card-img-top {
+        height: 300px;
+        object-fit: cover;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+    }
+
+    .category-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+        .category-card:hover {
+            background-color: #e9ecef;
+        }
+</style>

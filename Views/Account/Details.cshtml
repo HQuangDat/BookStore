@@ -1,4 +1,4 @@
-﻿@model BookStore.DataModels.Account
+@model BookStore.DataModels.Account
 
 @{
     ViewData["Title"] = "Account Details";
@@ -6,62 +6,74 @@
 
 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 {
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <div class="card shadow-sm border-0 rounded-4">
-                        <div class="card-header bg-primary text-white text-center rounded-top-4">
-                            <h2 class="mb-0">Account Details</h2>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Account Details</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Username</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.Username
+                            </div>
                         </div>
-                        <div class="card-body p-4">
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Username</label>
-                                <div class="fw-semibold">@Model.Username</div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Password</label>
-                                <div class="text-danger">••••••••</div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.Email
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Email</label>
-                                <div class="fw-semibold">@Model.Email</div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Address</h6>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Address</label>
-                                <div class="fw-semibold">@Model.Address</div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.Address
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Roles</label>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Roles</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
                                 @if (Model.Roles != null && Model.Roles.Any())
                                 {
-                                    <ul class="list-unstyled mb-0">
-                                        @foreach (var role in Model.Roles)
-                                        {
-                                            <li class="badge bg-secondary me-1">@role.RoleName</li>
-                                        }
-                                    </ul>
+                                    foreach (var role in Model.Roles)
+                                    {
+                                        <span class="badge bg-info me-1">@role.RoleName</span>
+                                    }
                                 }
                                 else
                                 {
-                                    <div class="text-muted">No roles assigned.</div>
+                                    <span class="text-muted">No roles assigned.</span>
                                 }
                             </div>
                         </div>
-                        <div class="card-footer bg-white text-center">
-                            <a asp-action="List" class="btn btn-outline-secondary px-4">Back to List</a>
-                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a asp-action="List" class="btn btn-secondary">Back to List</a>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 }
 else
 {
-    <div class="container py-5">
-        <div class="alert alert-warning text-center" role="alert">
-            You need to log in as an admin to view this page.
+    <div class="container mt-5">
+        <div class="alert alert-danger text-center" role="alert">
+            <h4>Access Denied</h4>
+            <p>You do not have permission to view this page. Please log in as an administrator.</p>
         </div>
     </div>
 }

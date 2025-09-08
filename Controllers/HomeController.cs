@@ -19,14 +19,14 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        const string cacheKey = "BookList";
-        if (!_cache.TryGetValue(cacheKey, out List<Book> indexBook))
+        const string cacheKey = "NewestBooks";
+        if (!_cache.TryGetValue(cacheKey, out List<Book> newestBooks))
         {
-            indexBook = _db.Books.ToList();
+            newestBooks = _db.Books.OrderByDescending(b => b.BookId).Take(10).ToList();
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-            _cache.Set(cacheKey, indexBook, cacheEntryOptions);
+            _cache.Set(cacheKey, newestBooks, cacheEntryOptions);
         }
-        return View(indexBook);
+        return View(newestBooks);
     }
 }

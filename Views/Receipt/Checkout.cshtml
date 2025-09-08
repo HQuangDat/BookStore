@@ -1,73 +1,80 @@
-﻿@model List<Cart>
+@model List<Cart>
+
+@{
+    ViewData["Title"] = "Checkout";
+}
 
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <!-- Receipt Card -->
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-dark text-white text-center py-3">
-                    <h3 class="mb-0"><i class="bi bi-receipt"></i> Order Summary</h3>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Order Summary</h2>
                 </div>
                 <div class="card-body">
-
-                    <!-- User Information -->
-                    <div class="mb-4 p-3 border rounded bg-light">
-                        <h5 class="fw-bold"><i class="bi bi-person-circle"></i> Customer Information</h5>
-                        <p class="mb-1"><strong>Email:</strong>@ViewBag.Email</p>
-                        <p><strong>Address:</strong> @ViewBag.Address</p>
-                    </div>
-
-                    <!-- Order Summary Table -->
-                    <table class="table table-borderless">
-                        <thead class="border-bottom">
-                            <tr>
-                                <th>Book Name</th>
-                                <th class="text-center">Quantity</th>
-                                <th class="text-end">Price</th>
-                                <th class="text-end">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
                                 <tr>
-                                    <td>@item.Book.BookName</td>
-                                    <td class="text-center">@item.Quantity</td>
-                                    <td class="text-end text-danger">$@item.Book.Price</td>
-                                    <td class="text-end fw-bold">$@((item.Quantity * item.Book.Price).ToString("0.00"))</td>
+                                    <th>Book</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Total</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-
-                    <!-- Divider -->
-                    <hr>
-
-                    <!-- Total Section -->
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold">Total Amount:</h5>
-                        <h4 class="text-danger fw-bold">$@Model.Sum(item => item.Quantity * item.Book.Price).ToString("0.00")</h4>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@item.Book.ImagePath" class="img-fluid rounded" style="width: 50px;" alt="Book Cover">
+                                                <div class="ms-3">
+                                                    <h6 class="mb-0">@item.Book.BookName</h6>
+                                                    <small class="text-muted">by @item.Book.Author</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">@item.Quantity</td>
+                                        <td class="text-end">$@item.Book.Price.ToString("0.00")</td>
+                                        <td class="text-end fw-bold">$@((item.Quantity * item.Book.Price).ToString("0.00"))</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <!-- Confirm Purchase Button -->
-                <div class="card-footer text-center bg-white">
-                    <form asp-controller="Receipt" asp-action="ConfirmCheckout" method="post">
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Customer Information</h2>
+                </div>
+                <div class="card-body">
+                    <p><strong>Email:</strong> @ViewBag.Email</p>
+                    <p><strong>Address:</strong> @ViewBag.Address</p>
+                </div>
+            </div>
+            <div class="card shadow-lg mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Total</h5>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total Amount:</span>
+                        <span>$@Model.Sum(item => item.Quantity * item.Book.Price).ToString("0.00")</span>
+                    </div>
+                    <form asp-controller="Receipt" asp-action="ConfirmCheckout" method="post" class="d-grid mt-4">
                         @Html.AntiForgeryToken()
-
                         @foreach (var item in Model)
                         {
                             <input type="hidden" name="CartItems[@Model.IndexOf(item)].BookId" value="@item.BookId" />
                             <input type="hidden" name="CartItems[@Model.IndexOf(item)].Quantity" value="@item.Quantity" />
                         }
-
-                        <button type="submit" class="btn btn-success btn-lg w-100">
-                            <i class="bi bi-credit-card"></i> Confirm Purchase
-                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg">Confirm Purchase</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-

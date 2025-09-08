@@ -1,58 +1,49 @@
-﻿@model BookStore.DataModels.BookWarehouse
+@model BookStore.DataModels.BookWarehouse
 
 @{
     ViewData["Title"] = "Edit Quantity";
 }
 
-@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+@if (User.IsInRole("Admin"))
 {
-    <section class="vh-100 d-flex align-items-center justify-content-center bg-light">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-5">
-                    <div class="card shadow-lg rounded-4">
-                        <div class="card-body p-4">
-                            <h3 class="text-center mb-4 text-primary fw-bold">Edit Book Quantity</h3>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Edit Book Quantity</h2>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="EditQuantity">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="BookId" />
+                            <input type="hidden" asp-for="WarehouseId" />
 
-                            <form asp-action="EditQuantity">
-                                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                                @Html.AntiForgeryToken()
-
-                                <input type="hidden" asp-for="BookId" />
-                                <input type="hidden" asp-for="WarehouseId" />
-
-                                <div class="mb-3">
-                                    <label asp-for="Quantity" class="form-label fw-semibold">Quantity</label>
-                                    <input asp-for="Quantity" class="form-control" placeholder="Enter new quantity" />
-                                    <span asp-validation-for="Quantity" class="text-danger"></span>
-                                </div>
-
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-success fw-bold">
-                                        <i class="bi bi-save me-1"></i> Save Changes
-                                    </button>
-                                </div>
-                            </form>
-
-                            <div class="mt-4 text-center">
-                                <a asp-action="List" class="text-decoration-none text-muted">
-                                    <i class="bi bi-arrow-left-circle"></i> Back to List
-                                </a>
+                            <div class="mb-3">
+                                <label asp-for="Quantity" class="form-label"></label>
+                                <input asp-for="Quantity" class="form-control" type="number" />
+                                <span asp-validation-for="Quantity" class="text-danger"></span>
                             </div>
-                        </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <a asp-action="ListQuantity" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 }
 else
 {
-    <h1>You are not supposed to be here!</h1>
-    <div class="mt-4 text-center">
-        <a asp-action="List" class="text-decoration-none text-muted">
-            <i class="bi bi-arrow-left-circle"></i> Back to List
-        </a>
+    <div class="container mt-5">
+        <div class="alert alert-danger text-center" role="alert">
+            <h4>Access Denied</h4>
+            <p>You do not have permission to view this page. Please log in as an administrator.</p>
+        </div>
     </div>
 }
 

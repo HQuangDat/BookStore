@@ -1,34 +1,52 @@
-﻿@model BookStore.DataModels.Category
+@model BookStore.DataModels.Category
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Category";
 }
 
-<h1 class="mb-4">Edit Category</h1>
+@if (User.IsInRole("Admin"))
+{
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Edit Category</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-action="Edit">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="CategoryId" />
 
-<div class="card shadow-sm p-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <form method="post" asp-action="Edit">
-                @Html.AntiForgeryToken()
-                <input type="hidden" asp-for="CategoryId" />
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label"></label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" placeholder="Enter category name" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <a asp-action="List" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-
-                <div class="d-flex justify-content-between">
-                    <a asp-action="List" class="btn btn-outline-secondary">Back to List</a>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
-
+}
+else
+{
+    <div class="container mt-5">
+        <div class="alert alert-danger text-center" role="alert">
+            <h4>Access Denied</h4>
+            <p>You do not have permission to view this page. Please log in as an administrator.</p>
+        </div>
+    </div>
+}
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

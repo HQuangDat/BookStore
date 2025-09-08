@@ -1,71 +1,62 @@
-﻿@model BookStore.DataModels.BookWarehouse
+@model BookStore.DataModels.BookWarehouse
 
 @{
-    ViewData["Title"] = "Add Book Quantity to Warehouse";
+    ViewData["Title"] = "Add Book to Warehouse";
 }
 
-@if(User.IsInRole("Admin"))
+@if (User.IsInRole("Admin"))
 {
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-6">
-                <!-- Card for Form -->
-                <div class="card shadow-lg border-0">
-                    <div class="card-header bg-dark text-white text-center py-3">
-                        <h3 class="mb-0"><i class="bi bi-box"></i> Add Book to Warehouse</h3>
+            <div class="col-lg-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Add Book to Warehouse</h2>
                     </div>
-
                     <div class="card-body">
                         <form asp-action="AddToWarehouse">
-                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            @Html.AntiForgeryToken()
 
-                            <!-- Select Book -->
                             <div class="mb-3">
-                                <label asp-for="BookId" class="form-label fw-bold"><i class="bi bi-book"></i> Select Book</label>
+                                <label asp-for="BookId" class="form-label">Book</label>
                                 <select asp-for="BookId" class="form-select" asp-items="ViewBag.AvailableBooks"></select>
                             </div>
 
-                            <!-- Select Warehouse -->
                             <div class="mb-3">
-                                <label asp-for="WarehouseId" class="form-label fw-bold"><i class="bi bi-house"></i> Select Warehouse</label>
+                                <label asp-for="WarehouseId" class="form-label">Warehouse</label>
                                 <select asp-for="WarehouseId" class="form-select" asp-items="ViewBag.AvailableWarehouses"></select>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Quantity</label>
-                                <input type="text" asp-for="Quantity" class="form-control" />
+                                <label asp-for="Quantity" class="form-label"></label>
+                                <input asp-for="Quantity" class="form-control" type="number" />
                                 <span asp-validation-for="Quantity" class="text-danger"></span>
                             </div>
 
-                            <!-- Submit Button -->
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-success btn-lg w-100">
-                                    @Html.AntiForgeryToken()
-                                    <i class="bi bi-plus-circle"></i> Add to Warehouse
-                                </button>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <a asp-action="List" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Add to Warehouse</button>
                             </div>
                         </form>
-                    </div>
-
-                    <!-- Footer with Back Button -->
-                    <div class="card-footer text-center bg-white">
-                        <a asp-action="List" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to List
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    @section Scripts {
-    @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
-    }
 }
 else
 {
-    <h1>You don't have authority for this function</h1>
+    <div class="container mt-5">
+        <div class="alert alert-danger text-center" role="alert">
+            <h4>Access Denied</h4>
+            <p>You do not have permission to view this page. Please log in as an administrator.</p>
+        </div>
+    </div>
 }
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
