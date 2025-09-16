@@ -39,12 +39,12 @@ namespace BookStore.Repositories
 
         public IEnumerable<Book> getAll()
         {
-            return _db.Books.Include(b => b.Categories).AsNoTracking().ToList();
+            return _db.Books.Include(b => b.Categories).AsNoTracking();
         }
 
         public IEnumerable<Category> GetAllCategories()
         {
-            return _db.Categories.AsNoTracking().ToList();
+            return _db.Categories.AsNoTracking();
         }
 
         public void RemoveBook(Book book)

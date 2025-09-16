@@ -90,7 +90,7 @@ namespace BookStore.Controllers
             try
             {
                 var cacheKey = $"books_all";
-                List<Book> books;
+                IEnumerable<Book> books;
                 ViewData["CurrentSort"] = sortOrder;
                 ViewData["SortByNameParam"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
                 ViewData["SortByAuthorParam"] = sortOrder == "Author" ? "Author_desc" : "Author";
@@ -100,7 +100,7 @@ namespace BookStore.Controllers
                 if (_memoryCache.TryGetValue(cacheKey, out List<Book> cachedbooks))
                 {
                     Log.Information("Found books and fetched them from cache");
-                    books = cachedbooks;
+                    books = cachedbooks!;
                 }
                 else
                 {
@@ -115,32 +115,32 @@ namespace BookStore.Controllers
                 switch (sortOrder)
                 {
                     case "Name_desc":
-                        books = books.OrderByDescending(b => b.BookName).ToList();
+                        books = books!.OrderByDescending(b => b.BookName);
                         break;
                     case "Author":
-                        books = books.OrderBy(b => b.Author).ToList();
+                        books = books!.OrderBy(b => b.Author);
                         break;
                     case "Author_desc":
-                        books = books.OrderByDescending(b => b.Author).ToList();
+                        books = books!.OrderByDescending(b => b.Author);
                         break;
                     case "Price":
-                        books = books.OrderBy(b => b.Price).ToList();
+                        books = books!.OrderBy(b => b.Price);
                         break;
                     case "Price_desc":
-                        books = books.OrderByDescending(b => b.Price).ToList();
+                        books = books!.OrderByDescending(b => b.Price);
                         break;
                     case "Provider":
-                        books = books.OrderBy(b => b.Provider).ToList();
+                        books = books!.OrderBy(b => b.Provider);
                         break;
                     case "Provider_desc":
-                        books = books.OrderByDescending(b => b.Provider).ToList();
+                        books = books!.OrderByDescending(b => b.Provider);
                         break;
                     default:
-                        books = books.OrderBy(b => b.BookName).ToList();
+                        books = books!.OrderBy(b => b.BookName);
                         break;
                 }
                 int pageSize = 5;
-                return View(PaginatedList<Book>.Create(books, pageNumber ?? 1, pageSize));
+                return View(PaginatedList<Book>.Create(books.ToList(), pageNumber ?? 1, pageSize));
             }
             finally
             {

@@ -11,6 +11,12 @@ namespace BookStore.Service
     public class SendMailService
     {
         private readonly ApplicationDbContext _db;
+
+        public SendMailService(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
         public async Task SendEmail(string email, string resetLink)
         {
             var message = new MailMessage();
